@@ -1,15 +1,41 @@
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #111;
   color: white;
   margin: 0;
   padding: 0;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+body.background-image {
+  background-image: url('https://oyster.ignimgs.com/wordpress/stg.ign.com/2016/09/Screen-Shot-2016-09-15-at-17.20.47.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@font-face {
+  font-family: 'Sinistra';
+  src: url('shlop\ rg.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+#start-screen h1 {
+  font-family: 'Sinistra', sans-serif;
+  font-size: 200px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 2px 2px 4px #000;
+
 }
 
 /* Tela de início */
@@ -19,6 +45,16 @@ body {
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
+  background: url('https://68.media.tumblr.com/f0e09588b780e959f95e4769343beaa0/tumblr_okpliklZ3e1vm2ftdo1_r1_500.gif') no-repeat center center/cover;
+  transition: opacity 2s ease;
+
+  position: absolute;
+  z-index: 1; /* <- muda só isso! deixa menor que o botão */
+}
+
+.fade-out {
+  opacity: 0;
 }
 
 /* Tela do jogo */
@@ -100,7 +136,7 @@ button:hover {
   font-size: 14px;
   cursor: pointer;
   border-radius: 8px;
-  z-index: 1000;
+  z-index: 99999; /* alto pra ficar por cima de tudo */
   opacity: 0.7;
   transition: opacity 0.3s, background-color 0.3s;
 }

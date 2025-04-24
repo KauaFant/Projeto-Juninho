@@ -5,11 +5,14 @@ const storyText = document.getElementById("story-text");
 const nextBtn = document.getElementById("next-btn");
 const bgMusic = document.getElementById("bg-music");
 const creepySound = document.getElementById("creepy-sound");
-
+const scaryMusic = document.getElementById("scary-music");
+const newMusic = document.getElementById("new-music");
+const heart = document.getElementById("heart");
 const backBtn = document.getElementById("back-btn");
 const choicesDiv = document.getElementById("choices");
 const choice1Btn = document.getElementById("choice-1");
 const choice2Btn = document.getElementById("choice-2");
+
 
 let storyIndex = 0;
 let currentPath = null;
@@ -28,7 +31,8 @@ const storyRoom = [
   "Você chega na escada, está muito escuro.",
   "Cada passo que você dá, o chão range como se avisasse que você está chegando.",
   "De repente, a lanterna pisca — algo se moveu ao fundo.",
-  "Você respira fundo e continua, com o coração acelerado."
+  "Você respira fundo e continua, com o coração acelerado.",
+  "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte"
 ];
 
 const storybedroom = [
@@ -46,41 +50,125 @@ choice1Btn.addEventListener("click", chooseOption1);
 choice2Btn.addEventListener("click", chooseOption2);
 
 function startGame() {
-  startScreen.classList.add("hidden");
-  gameScreen.classList.remove("hidden");
-  bgMusic.play();
+  // Inicia o fade-out da tela de início
+  startScreen.classList.add("fade-out");
+  startScreen.style.transition = "opacity 2s ease"; // Transição suave
+  startScreen.style.opacity = "0"; // Tornando a tela invisível com o fade
 
-  storyIndex = 0;
-  showStory();
-  nextBtn.classList.remove("hidden");
-  backBtn.classList.remove("hidden");
+  // Espera 2 segundos antes de trocar de tela
+  setTimeout(() => {
+    startScreen.classList.add("hidden"); // Esconde a tela de início completamente
+    gameScreen.classList.remove("hidden"); // Exibe a tela do jogo
+
+    // Inicia a música de fundo após o fade-out
+    bgMusic.play(); 
+
+    // Restaura o índice da história e exibe o conteúdo inicial
+    storyIndex = 0;
+    showStory(); // Exibe o conteúdo da história
+    nextBtn.classList.remove("hidden"); // Mostra o botão de avançar
+    backBtn.classList.remove("hidden"); // Mostra o botão de voltar
+
+    // Remover a classe para permitir reiniciar depois
+    startScreen.classList.remove("fade-out");
+
+  }, 2000); // Tempo de espera para o fade-out
+}
+
+function nextStory() {
+  if (currentPath) {
+    pathIndex++;
+    if (pathIndex < currentPath.length) {
+      storyText.textContent = currentPath[pathIndex];
+
+      // Verifica a frase para aplicar ou remover o fundo
+      if (storyText.textContent === "Você liga sua lanterna, olha para a porta com medo.") {
+        document.body.classList.add('background-image');
+      } else {
+        document.body.classList.remove('background-image');
+      }
+
+      // Sons da trilha alternativa
+      if (storyText.textContent === "De repente, a lanterna pisca — algo se moveu ao fundo.") {
+        heart.currentTime = 0;
+        heart.play();
+      }
+
+      if (storyText.textContent === "Mas eles não param. Pelo contrário, parecem mais próximos.") {
+        newMusic.currentTime = 0;
+        newMusic.play();
+      }
+
+    } else {
+      currentPath = null;
+      alert("Fim do jogo! Obrigado por jogar.");
+      nextBtn.classList.add("hidden");
+      bgMusic.pause();
+      document.body.classList.remove('background-image'); // Limpa fundo ao final
+    }
+  } else {
+    storyIndex++;
+    if (storyIndex < storyLines.length) {
+      showStory();
+
+      // Sons da trilha principal
+      if (storyLines[storyIndex] === "Barulhos estranhos aparecem, aparentemente vêm da sala.") {
+        creepySound.currentTime = 0;
+        creepySound.play();
+      }
+
+    } else {
+      nextBtn.classList.add("hidden");
+      alert("Fim do jogo! Obrigado por jogar.");
+      bgMusic.pause();
+      document.body.classList.remove('background-image'); // Limpa fundo ao final
+    }
+  }
+  if (storyText.textContent === "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte") {
+    heart.volume = 0.0;
+    heart.playbackRate = 2.0; // Aumenta a velocidade do som
+    heart.currentTime = 0;
+    heart.play();
+  
+    let volumeStep = 0.1;
+    let volumeInterval = setInterval(() => {
+      if (heart.volume < 1.0) {
+        heart.volume = Math.min(heart.volume + volumeStep, 1.0);
+      } else {
+        clearInterval(volumeInterval);
+      }
+    }, 200);
+  }
 }
 
 function showStory() {
-
-  if (storyIndex < storyLines.length) {
-    storyText.textContent = storyLines[storyIndex];
-    if (storyIndex === 5) {
-      showChoices();
-    } else {
-      choicesDiv.classList.add("hidden");
-      nextBtn.classList.remove("hidden");
-    }
-    if (storyIndex < storyLines.length) {
-      storyText.textContent = storyLines[storyIndex];
-      if (storyLines[storyIndex] === "Barulhos estranhos aparecem, aparentemente vêm da sala.") {
-        bgMusic.pause(); 
-        creepySound.currentTime = 0;
-        creepySound.play(); 
+  storyText.textContent = storyLines[storyIndex];
+  if (storyText.textContent === "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte") {
+    heart.volume = 0.1;
+    heart.playbackRate = 2.0; // Aumenta a velocidade aqui também
+    heart.currentTime = 0;
+    heart.play();
+  
+    let volumeStep = 0.05;
+    let volumeInterval = setInterval(() => {
+      if (heart.volume < 1) {
+        heart.volume = Math.min(heart.volume + volumeStep, 1);
       } else {
-        creepySound.pause();
-        creepySound.currentTime = 0;
-    
-        if (bgMusic.paused) {
-          bgMusic.play();
-        }
+        clearInterval(volumeInterval);
       }
-    }
+    }, 300);
+  }
+
+  // Verifica a frase para aplicar ou remover o fundo
+  if (storyLines[storyIndex] === "Você liga sua lanterna, olha para a porta com medo.") {
+    document.body.classList.add('background-image');
+  } else {
+    document.body.classList.remove('background-image');
+  }
+
+  // Se for o último texto da história principal, mostra escolhas
+  if (storyIndex === storyLines.length - 1) {
+    showChoices();
   }
 }
 
@@ -100,6 +188,21 @@ function chooseOption1() {
 }
 
 function chooseOption2() {
+  // Pausar qualquer som que já esteja tocando
+  if (!scaryMusic.paused) {
+    scaryMusic.pause();
+    scaryMusic.currentTime = 0; // Reinicia o som
+  }
+
+  // Pausar a música de fundo
+  bgMusic.pause();
+  bgMusic.currentTime = 0; // Reinicia a música de fundo
+
+  // Tocar a música de susto
+  scaryMusic.currentTime = 0;
+  scaryMusic.play();
+
+  // Mudar para a história do quarto
   currentPath = storybedroom;
   pathIndex = 0;
   storyText.textContent = currentPath[pathIndex];
@@ -107,47 +210,42 @@ function chooseOption2() {
   nextBtn.classList.remove("hidden");
 }
 
-function nextStory() {
-  if (currentPath) {
-    pathIndex++;
-    if (pathIndex < currentPath.length) {
-      storyText.textContent = currentPath[pathIndex];
-    } else {
-      currentPath = null;
-      alert("Fim do jogo! Obrigado por jogar.");
-      nextBtn.classList.add("hidden");
-      bgMusic.pause();
-    }
-  } else {
-    storyIndex++;
-    if (storyIndex < storyLines.length) {
-      showStory();
-    } else {
-      nextBtn.classList.add("hidden");
-      alert("Fim do jogo! Obrigado por jogar.");
-      bgMusic.pause();
-    }
-  }
-}
 
 backBtn.addEventListener("click", restartGame);
-
 function restartGame() {
+  // Esconde a tela do jogo
   gameScreen.classList.add("hidden");
-  startScreen.classList.remove("hidden");
 
+  // Resetando os dados do jogo
   storyIndex = 0;
   pathIndex = 0;
   currentPath = null;
-
   storyText.textContent = "";
   choicesDiv.classList.add("hidden");
   nextBtn.classList.add("hidden");
   backBtn.classList.add("hidden");
 
+  // Pausar todas as músicas e sons
   bgMusic.pause();
   bgMusic.currentTime = 0;
-
   creepySound.pause();
   creepySound.currentTime = 0;
+  scaryMusic.pause();
+  scaryMusic.currentTime = 0;
+  heart.pause();
+  heart.currentTime = 0;
+  newMusic.pause(); // << ADICIONADO
+  newMusic.currentTime = 0; // << ADICIONADO
+
+  // A tela de início será mostrada novamente sem aplicar o fade-out
+  startScreen.classList.remove("fade-out");
+  startScreen.style.opacity = "1"; // Garantir que a opacidade esteja 100% quando voltar
+
+  // Exibe o botão "Voltar ao Início" novamente
+  backBtn.classList.remove("hidden");
+
+  // Restaura a visibilidade da tela de início após reiniciar
+  setTimeout(() => {
+    startScreen.classList.remove("hidden");
+  }, 100);
 }
