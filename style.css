@@ -72,6 +72,7 @@ body.background-image {
   margin-bottom: 20px;
   max-width: 80%;
   line-height: 1.5;
+  transition: opacity 0.5s ease;
 }
 
 /* Botões padrão */
@@ -144,4 +145,134 @@ button:hover {
 #back-btn:hover {
   opacity: 1;
   background-color: #444;
+}
+
+#fnaf4-scene {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+#fnaf4-canvas {
+  width: 100%;
+  height: 100%;
+  background-color: black; /* Padrão escuro */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#flashlight-btn, #danger-btn {
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #111;
+  color: #fff;
+  cursor: pointer;
+}
+
+#flashlight-btn.active {
+  background-color: yellow;
+  color: black;
+  box-shadow: 0 0 20px yellow;
+}
+
+#danger-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: red;
+  color: white;
+  padding: 10px 20px; /* Reduzido */
+  font-size: 16px;     /* Reduzido */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 9999;
+  display: none;
+}
+
+#death-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, black 0%, red 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  flex-direction: column;
+}
+
+#retry-btn {
+  padding: 20px 40px;
+  font-size: 24px;
+  background-color: #000;
+  color: red;
+  border: 2px solid red;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#retry-btn:hover {
+  background-color: red;
+  color: black;
+}
+
+#fnaf4-scene.background-visible {
+  display: block; /* Exibe a imagem quando a classe for adicionada */
+}
+
+#fnafLightReveal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://64.media.tumblr.com/58c9787cbc0cf6a59c527301fa8057dc/0d766f1f08386abe-3e/s540x810/d7a2c295c565a7c2ad2c8af5e4bec694248ecee7.gif');
+  background-size: cover;
+  background-position: center;
+  z-index: 1000;
+  display: none;
+  
+  /* Aplica a máscara circular baseada na posição do mouse */
+  mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  pointer-events: none; /* permite que o mouse interaja com o que está atrás */
+}
+
+#video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+#scary-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

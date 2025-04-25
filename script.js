@@ -12,7 +12,15 @@ const backBtn = document.getElementById("back-btn");
 const choicesDiv = document.getElementById("choices");
 const choice1Btn = document.getElementById("choice-1");
 const choice2Btn = document.getElementById("choice-2");
+const fnafMiniGameSound = document.getElementById("fnaf-mini-game-sound");
+const deathScreen = document.getElementById("death-screen");
+const retryBtn = document.getElementById("retry-btn");
+const fnafLightReveal = document.getElementById("fnafLightReveal");
 
+
+//ambientFnafSound.currentTime = 0;
+//ambientFnafSound.loop = true;
+//ambientFnafSound.play();
 
 let storyIndex = 0;
 let currentPath = null;
@@ -29,10 +37,13 @@ const storyLines = [
 const storyRoom = [
   "Você decide ir para a sala. Você abre a porta, anda no corredor, com medo e apenas uma lanterna para se proteger.",
   "Você chega na escada, está muito escuro.",
-  "Cada passo que você dá, o chão range como se avisasse que você está chegando.",
+  "Cada passo que você dá, o chão range como se avisasse que alguém está chegando.",
   "De repente, a lanterna pisca — algo se moveu ao fundo.",
   "Você respira fundo e continua, com o coração acelerado.",
-  "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte"
+  "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte",
+  "Os sons param, você só escuta seu coração.",
+  "Você chega na porta da sala, abre a porta e...",
+  "Não da para acretidar no que você ouviu... A mansão é assombrada?.."
 ];
 
 const storybedroom = [
@@ -124,7 +135,7 @@ function nextStory() {
       document.body.classList.remove('background-image'); // Limpa fundo ao final
     }
   }
-  if (storyText.textContent === "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte") {
+  if (storyText.textContent === "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte") {
     heart.volume = 0.0;
     heart.playbackRate = 2.0; // Aumenta a velocidade do som
     heart.currentTime = 0;
@@ -139,11 +150,19 @@ function nextStory() {
       }
     }, 200);
   }
+  if (storyText.textContent === "Os sons param, você só escuta seu coração.") {
+    bgMusic.pause();
+    bgMusic.currentTime = 0; // Reseta a música
+  }
+  if (storyText.textContent === "Você chega na porta da sala, abre a porta e...") {
+  startFnafScene();
+  return;
+}
 }
 
 function showStory() {
   storyText.textContent = storyLines[storyIndex];
-  if (storyText.textContent === "Você finalmente chega no ander de baixo. Está escuro, seu coração bate mais forte") {
+  if (storyText.textContent === "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte") {
     heart.volume = 0.1;
     heart.playbackRate = 2.0; // Aumenta a velocidade aqui também
     heart.currentTime = 0;
@@ -221,6 +240,8 @@ function restartGame() {
   pathIndex = 0;
   currentPath = null;
   storyText.textContent = "";
+  fnafLightReveal.style.display = "none"; // Esconde a imagem com máscara
+  lanternOn = false;
   choicesDiv.classList.add("hidden");
   nextBtn.classList.add("hidden");
   backBtn.classList.add("hidden");
@@ -234,18 +255,171 @@ function restartGame() {
   scaryMusic.currentTime = 0;
   heart.pause();
   heart.currentTime = 0;
-  newMusic.pause(); // << ADICIONADO
-  newMusic.currentTime = 0; // << ADICIONADO
-
-  // A tela de início será mostrada novamente sem aplicar o fade-out
+  newMusic.pause();
+  newMusic.currentTime = 0;
+  fnafMiniGameSound.pause();
+  fnafMiniGameSound.currentTime = 0;
+  // Exibe a tela de início novamente
   startScreen.classList.remove("fade-out");
-  startScreen.style.opacity = "1"; // Garantir que a opacidade esteja 100% quando voltar
+  startScreen.style.opacity = "1"; // Garantir que a opacidade esteja 100%
 
-  // Exibe o botão "Voltar ao Início" novamente
+  // Exibe a tela de início
+  startScreen.classList.remove("hidden");
+
+  // Exibe o botão de "Voltar ao Início"
   backBtn.classList.remove("hidden");
 
-  // Restaura a visibilidade da tela de início após reiniciar
-  setTimeout(() => {
-    startScreen.classList.remove("hidden");
-  }, 100);
+  // Restaura o estado da lanterna
+  flashlightOn = false;
+  fnafCanvas.removeEventListener("mousemove", moveLantern);
+  fnafCanvas.style.background = "black";  // Fica preto quando a lanterna estiver desligada
+  
 }
+
+const fnafScene = document.getElementById("fnaf4-scene");
+  const fnafCanvas = document.getElementById("fnaf4-canvas");
+  const flashlightBtn = document.getElementById("flashlight-btn");
+  const dangerBtn = document.getElementById("danger-btn");
+
+  let flashlightOn = false;
+  let dangerTimeout;
+
+  function startFnafScene() {
+    // Fade da música atual
+    bgMusic.pause();
+    creepySound.pause();
+  
+    // Toca o som do mini game FNaF
+    fnafMiniGameSound.currentTime = 0; // Reseta o áudio
+    fnafMiniGameSound.play(); // Começa o som
+  
+    // Fade to black por 2 segundos
+    document.body.style.transition = "opacity 2s ease";
+    document.body.style.opacity = "0";
+    
+    setTimeout(() => {
+      gameScreen.classList.add("hidden");
+      fnafScene.classList.remove("hidden");
+      document.body.style.opacity = "1";
+    }, 2000);
+    
+    // Resetar controles
+    flashlightOn = false;
+    dangerBtn.classList.add("hidden");
+    
+    // Começa o cronômetro para continuar história se jogador não apertar o botão
+    dangerTimeout = setTimeout(() => {
+      endFnafScene(); // Aqui você vai terminar a cena FNaF caso o jogador não clique a tempo
+    }, 30000); // 30 segundos
+  }
+
+  fnafCanvas.addEventListener("mousemove", (e) => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const radius = 100; // área sensível ao redor do centro
+  
+    const dx = e.clientX - centerX;
+    const dy = e.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+  
+    if (distance < radius) {
+      dangerBtn.style.display = "block"; // mostra o botão
+    } else {
+      dangerBtn.style.display = "none"; // esconde se sair do centro
+    }
+  });
+
+  flashlightBtn.addEventListener("click", () => {
+    flashlightOn = !flashlightOn;
+    
+    // Esconder imagem ao voltar ao início
+    backBtn.addEventListener("click", () => {
+      lightReveal.style.display = "none";
+      // outras coisas que já ocorrem aqui, como resetar a história
+    });
+
+    // Esconder imagem ao morrer e clicar em "tentar novamente"
+    retryBtn.addEventListener("click", () => {
+      lightReveal.style.display = "none";
+    });
+
+    if (flashlightOn) {
+      fnafCanvas.addEventListener("mousemove", moveLantern);
+      fnafCanvas.style.background = "none";
+      fnafLightReveal.style.display = "block"; // Mostra imagem de fundo iluminada
+      lanternOn = true;
+    } else {
+      fnafCanvas.removeEventListener("mousemove", moveLantern);
+      fnafCanvas.style.background = "black";
+      fnafLightReveal.style.display = "none"; // Esconde a imagem iluminada
+      lanternOn = false;
+    }
+  
+    if (flashlightOn) {
+      dangerBtn.classList.remove("hidden");
+    } else {
+      dangerBtn.classList.add("hidden");
+    }
+  });
+  
+  dangerBtn.addEventListener("click", () => {
+    clearTimeout(dangerTimeout);  // Para o tempo de perigo
+    fnafScene.classList.add("hidden");
+  
+    // PAUSA o som do mini game
+    fnafMiniGameSound.pause();
+    fnafMiniGameSound.currentTime = 0;
+  
+    // Mostra o vídeo de susto
+    const videoContainer = document.getElementById("video-container");
+    const scaryVideo = document.getElementById("scary-video");
+  
+    videoContainer.classList.remove("hidden");
+    scaryVideo.currentTime = 0;
+    scaryVideo.play();
+  
+    // Quando o vídeo terminar, mostrar a tela de morte
+    scaryVideo.onended = () => {
+      videoContainer.classList.add("hidden");
+      deathScreen.classList.remove("hidden");
+    };
+  });
+
+
+function endFnafScene() {
+  fnafScene.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+
+  storyText.textContent = "Você entra na sala, mas parece vazia... Por enquanto.";
+  nextBtn.classList.remove("hidden");
+  currentPath = null;
+
+  fnafMiniGameSound.pause();
+  fnafMiniGameSound.currentTime = 0;
+
+  fnafLightReveal.style.display = "none"; // <-- Adicionado aqui
+  lanternOn = false;
+}
+
+
+function moveLantern(e) {
+  const x = e.clientX;
+  const y = e.clientY;
+  fnafCanvas.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.85) 200px, rgba(0,0,0,1) 400px)`;
+}
+
+retryBtn.addEventListener("click", () => {
+  deathScreen.classList.add("hidden");
+  restartGame();
+});
+
+let lanternOn = false;
+
+document.addEventListener("mousemove", (e) => {
+  if (lanternOn) {
+    const x = e.clientX;
+    const y = e.clientY;
+    fnafLightReveal.style.setProperty("--x", `${x}px`);
+    fnafLightReveal.style.setProperty("--y", `${y}px`);
+  }
+});
