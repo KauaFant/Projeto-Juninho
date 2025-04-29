@@ -55,6 +55,8 @@ const storybedroom = [
   "A maçaneta da porta se move sozinha.",
   "Com muito medo, você tenta ficar em silêncio total.",
   "Você sobe em cima da cama, segura sua lanterna e começa a tremer...",
+  "Você não tem certeza se trancou a porta..",
+  "Então você decide ir trancar.. com medo..",
   "Os sons param, você só escuta seu coração.",
   "Você sente mais medo.."
 ];
@@ -72,6 +74,10 @@ const postFnafLines = [
   "Você fica confuso, não sabe se vai ajuda-lá.",
   "Você quer ir?"
 ];
+
+const evilEnd = {
+
+}
 
 // Eventos
 startBtn.addEventListener("click", startGame);
@@ -111,7 +117,7 @@ function startGame() {
     // Remover a classe para permitir reiniciar depois
     startScreen.classList.remove("fade-out");
 
-  }, 3000); // Tempo de espera para o fade-out
+  }, 2000); // Tempo de espera para o fade-out
 }
 
 function nextStory() {
@@ -255,8 +261,12 @@ function nextStory() {
   }
 
   if (storyText.textContent === "Você sente mais medo..") {
-    enterFnaf4Mode();
-
+    newMusic.currentTime = 0;
+    newMusic.play();
+    gameScreen.classList.add("hidden"); // Esconde o jogo normal
+    document.getElementById("minigame-room").classList.remove("hidden"); // Mostra o minigame
+    iniciarMiniGame();
+    return; // Para a progressão da história até o minigame terminar
   }
 
   if (storyText.textContent === "Você chega na porta da sala, abre a porta e...") {
@@ -366,87 +376,113 @@ function restartGame() {
   location.reload();
 }
 
-function enterFnaf4Mode() {
-  // Esconde os elementos normais
-  storyText.classList.add("hidden");
-  nextBtn.classList.add("hidden");
-  choicesDiv.classList.add("hidden");
+function iniciarMiniGame() {
+  const player = document.getElementById("player");
+  const chave = document.getElementById("chave");
+  const porta = document.getElementById("porta");
+  const bonnie = document.getElementById("bonnie")
 
-  activateFlashlight(); // Ativa a lanterna
-  startFnaf4Mode();     // <<< CHAMA AQUI para mudar o fundo e mostrar botões
-  fnaf4();
+  let posX = 50;
+  let posY = 20;
+  let chaveColetada = false;
 
-  // Mostra a tela FNAF 4
-  const fnaf4Screen = document.getElementById("fnaf4Screen");
-  fnaf4Screen.classList.remove("hidden");
+  const limiteX = { min: 0, max: window.innerWidth - 50 };
+  const limiteY = { min: 0, max: window.innerHeight - 50 };
 
-  // Toca o som de fundo assustador
-  newMusic.currentTime = 0;
-  newMusic.play();
-  scaryMusic.currentTime = 0;
-  scaryMusic.play();
-}
+  // Função para verificar colisões
+  function verificarColisao(a, b) {
+    const aRect = a.getBoundingClientRect();
+    const bRect = b.getBoundingClientRect();
 
-let fnafMode = false; // Só ativa quando estiver no modo FNaF
-const cameraContainer = document.getElementById('camera-container'); // Crie um div para a "câmera"
+    return !(
+      aRect.right < bRect.left ||
+      aRect.left > bRect.right ||
+      aRect.bottom < bRect.top ||
+      aRect.top > bRect.bottom
+    );
+  }
 
-function startFnaf4Mode() {
-  fnafMode = true;
-  document.body.style.backgroundImage = "url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/bc8fc28f-ccde-4aa6-816a-709b75c1627a/dbj04ha-4aac147b-8169-46ff-9b36-537293d205ad.jpg/v1/fill/w_1192,h_670,q_70,strp/fnaf_4_bedroom__fnaf___sfm__by_deuzfazbear_dbj04ha-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzIwIiwicGF0aCI6IlwvZlwvYmM4ZmMyOGYtY2NkZS00YWE2LTgxNmEtNzA5Yjc1YzE2MjdhXC9kYmowNGhhLTRhYWMxNDdiLTgxNjktNDZmZi05YjM2LTUzNzI5M2QyMDVhZC5qcGciLCJ3aWR0aCI6Ijw9MTI4MCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.wS0vd0adFLLCoA_4yFfyGBkbJFbWAwKvitzvjAgNfN0')"; // Muda o fundo para o quarto
-  document.body.style.backgroundSize = "cover";
-  document.body.style.backgroundPosition = "center";
-
-// Mostrar a tela de FNaF 4
-document.getElementById('fnaf4Screen').classList.remove('hidden');
-document.getElementById('flashlight-btn').classList.remove('hidden'); // Mostrar o botão da lanterna
-document.getElementById('btn-armario').classList.remove('hidden');
-document.getElementById('btn-esquerda').classList.remove('hidden');
-document.getElementById('btn-direita').classList.remove('hidden');
-
-  // Sons de fundo
-  newMusic.currentTime = 0;
-  newMusic.loop = true;
-  newMusic.play();
-  heart.currentTime = 0;
-  heart.play();
-
-  // Se o botão de lanterna for necessário, defina-o como visível
-  document.getElementById('flashlight-btn').classList.remove('hidden');
-}
-
-function fnaf4() {
-  // Monitorando o movimento do mouse para a câmera
-  document.addEventListener('mousemove', (e) => {
-    if (!fnafMode) return; // Só executa quando estiver no modo FNaF
-
-    const screenWidth = window.innerWidth;
-    const mouseX = e.clientX;
-
-    const centerThreshold = screenWidth * 0.33; // Divisão da tela
-
-    if (mouseX < centerThreshold) {
-      // Olhando para a esquerda
-      cameraContainer.style.backgroundImage = "url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/7/76/LeftHall.png/revision/latest?cb=20150730153347')";
-      cameraContainer.style.backgroundPosition = "center";
-    } else if (mouseX > screenWidth - centerThreshold) {
-      // Olhando para a direita
-      cameraContainer.style.backgroundImage = "url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fc/Righthall.png/revision/latest?cb=20150730170154')";
-      cameraContainer.style.backgroundPosition = "center";
-    } else {
-      // Olhando para frente (armário)
-      cameraContainer.style.backgroundImage = "url('https://pm1.aminoapps.com/6349/403babee5aa86102f1a4b4b51ac2cc9bb17fab00_hq.jpg')";
-      cameraContainer.style.backgroundPosition = "center";
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "ArrowLeft":
+        posX = Math.max(limiteX.min, posX - 10);
+        break;
+      case "ArrowRight":
+        posX = Math.min(limiteX.max, posX + 10);
+        break;
+      case "ArrowUp":
+        posY = Math.min(limiteY.max, posY + 10);
+        break;
+      case "ArrowDown":
+        posY = Math.max(limiteY.min, posY - 10);
+        break;
     }
-  });
-}
 
-function activateFlashlight() {
-  const flashlight = document.getElementById('flashlight');
-  flashlight.style.display = 'block';
+    player.style.left = posX + "px";
+    player.style.bottom = posY + "px";
 
-  document.addEventListener('mousemove', (e) => {
-    flashlight.style.background = `radial-gradient(circle 150px at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.95) 80%)`;
+    // Coletando a chave
+    if (!chaveColetada && verificarColisao(player, chave)) {
+      chaveColetada = true;
+      chave.style.display = "none";  // A chave desaparece quando coletada
+    }
+
+    // Verificando se o jogador está perto da porta
+    if (verificarColisao(player, porta)) {
+      if (chaveColetada) {
+        alert("Você destrancou a porta e saiu da sala!");
+        document.getElementById("minigame-room").classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+        currentPath = postFnafLines;  // Caminho para continuar a história
+        pathIndex = 0;
+        storyText.textContent = currentPath[pathIndex];
+        nextBtn.classList.remove("hidden");
+      } else {
+        alert("A porta está trancada. Encontre a chave!");
+      }
+    }
+    document.querySelectorAll(".bonnie").forEach(bonnie => {
+      if (verificarColisao(player, bonnie)) {
+        // Oculta o minigame
+        document.getElementById("minigame-room").classList.add("hidden");
+
+        // Mostra o vídeo de susto
+        const videoContainer = document.getElementById("video-container");
+        const scaryVideo = document.getElementById("scary-video");
+        const deathScreen = document.getElementById("death-screen");
+        const deathText = document.getElementById("death-text");
+
+        videoContainer.classList.remove("hidden");
+        scaryVideo.play();
+
+        // Ao final do vídeo, mostra a tela de morte
+        scaryVideo.onended = () => {
+          videoContainer.classList.add("hidden");
+          deathScreen.classList.remove("hidden");
+          deathText.classList.remove("hidden");
+        };
+      }
+    });
   });
+
+  // Botão para sair do minigame
+  setTimeout(() => {
+    const btn = document.createElement("button");
+    btn.textContent = "Avançar";
+    btn.style.position = "absolute";
+    btn.style.bottom = "20px";
+    btn.style.right = "20px";
+    btn.style.zIndex = "9999";
+    btn.onclick = () => {
+      document.getElementById("minigame-room").classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      currentPath = postFnafLines; // ou qualquer caminho que você deseja continuar
+      pathIndex = 0;
+      storyText.textContent = currentPath[pathIndex];
+      nextBtn.classList.remove("hidden");
+    };
+    document.getElementById("minigame-room").appendChild(btn);
+  }, 20000); // 15 segundos para mostrar o botão "Avançar"
 }
 
 const fnafScene = document.getElementById("fnaf4-scene");

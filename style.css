@@ -419,7 +419,7 @@ button:hover {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  box-shadow: 0 0 10px palevioletred;
+  box-shadow: 0 0 10px rgb(184, 106, 132);
   transition: transform 0.2s, opacity 0.3s ease;
   opacity: 0; /* Inicialmente invisível */
   pointer-events: none; /* Impede clique quando invisível */
@@ -651,4 +651,55 @@ section {
   mix-blend-mode: lighten;
   z-index: 9999;  /* Garante que a lanterna fique acima de outros elementos */
   display: none;  /* Só exibe quando ativado */
+}
+
+#minigame-room {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://pm1.aminoapps.com/7043/7a0a1105b1af6e1e8bdf66f54c5fa2cc45263374r1-720-720v2_hq.jpg'); /* imagem do quarto */
+  background-size: cover;
+  overflow: hidden;
+}
+
+#player {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background-image: url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927'); /* personagem */
+  background-size: contain;
+  background-repeat: no-repeat;
+  left: 50px;
+  bottom: 20px;
+}
+
+#chave {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  background-image: url('https://w7.pngwing.com/pngs/656/557/png-transparent-key-along-skeleton-key-art-thumbnail.png'); /* Imagem da chave */
+  background-size: cover;
+  left: 500px; /* posição da chave */
+  bottom: 100px;
+  z-index: 5;
+}
+
+#porta {
+  position: absolute;
+  width: 150px; /* Aumentei o tamanho da largura da porta */
+  height: 250px; /* Aumentei o tamanho da altura da porta */
+  background-image: url('https://static.wikia.nocookie.net/fivenightsatfreddys/images/e/ea/Closet.png/revision/latest?cb=20180827134325'); /* Imagem da porta */
+  background-size: cover;
+  left: 1500px; /* posição da porta */
+  bottom: 20px;
+  z-index: 5;
+}
+
+.bonnie {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-image: url('https://media.tenor.com/mz4rNFNJT1kAAAAj/rwqfsfasxc-fnaf.gif');
+  background-size: cover;
+  z-index: 3;
 }
