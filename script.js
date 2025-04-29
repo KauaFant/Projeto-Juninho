@@ -16,6 +16,9 @@ const fnafMiniGameSound = document.getElementById("fnaf-mini-game-sound");
 const deathScreen = document.getElementById("death-screen");
 const retryBtn = document.getElementById("retry-btn");
 const fnafLightReveal = document.getElementById("fnafLightReveal");
+const mysterious = document.getElementById("mysterious");
+const fear = document.getElementById("theme");
+const intro = document.getElementById("intro-music");
 
 
 //ambientFnafSound.currentTime = 0;
@@ -42,8 +45,7 @@ const storyRoom = [
   "Você respira fundo e continua, com o coração acelerado.",
   "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte",
   "Os sons param, você só escuta seu coração.",
-  "Você chega na porta da sala, abre a porta e...",
-  "Não da para acretidar no que você ouviu... A mansão é assombrada?.."
+  "Você chega na porta da sala, abre a porta e..."
 ];
 
 const storybedroom = [
@@ -51,7 +53,24 @@ const storybedroom = [
   "Você se tranca no quarto, tentando ignorar os sons lá fora.",
   "Mas eles não param. Pelo contrário, parecem mais próximos.",
   "A maçaneta da porta se move sozinha.",
-  "Você grita, mas ninguém responde."
+  "Com muito medo, você tenta ficar em silêncio total.",
+  "Você sobe em cima da cama, segura sua lanterna e começa a tremer...",
+  "Os sons param, você só escuta seu coração.",
+  "Você sente mais medo.."
+];
+
+const postFnafLines = [
+  "Não da para acretidar no que você viu e ouviu... A mansão é assombrada?..",
+  "Sem pensar duas vezes você sai da sala, tranca a porta",
+  "Você começa a escutar outro som.",
+  "Parece que vem do seu quarto..",
+  "Você sente um calafrio no corpo, e sente mais medo.",
+  "Até que...",
+  "DESCONHECIDO: Oii, você mora aqui?",
+  "DESCONHECIDO: Não precisa ter medo, eu não vou te machucar!",
+  "DESCONHECIDO: Eu to aqui! Presa na parede!",
+  "Você fica confuso, não sabe se vai ajuda-lá.",
+  "Você quer ir?"
 ];
 
 // Eventos
@@ -61,6 +80,8 @@ choice1Btn.addEventListener("click", chooseOption1);
 choice2Btn.addEventListener("click", chooseOption2);
 
 function startGame() {
+  intro.currentTime = 0;
+  intro.play();
   // Inicia o fade-out da tela de início
   startScreen.classList.add("fade-out");
   startScreen.style.transition = "opacity 2s ease"; // Transição suave
@@ -68,7 +89,14 @@ function startGame() {
 
   // Espera 2 segundos antes de trocar de tela
   setTimeout(() => {
+    intro.pause();
+    intro.currentTime = 0;
     startScreen.classList.add("hidden"); // Esconde a tela de início completamente
+    const medrosoBtn = document.getElementById("Medroso");
+    medrosoBtn.classList.add("hidden");     // Esconde o botão
+    medrosoBtn.classList.remove("active");  // Remove efeito ativo
+    medrosoBtn.style.pointerEvents = "none"; // Impede clique
+
     gameScreen.classList.remove("hidden"); // Exibe a tela do jogo
 
     // Inicia a música de fundo após o fade-out
@@ -83,7 +111,7 @@ function startGame() {
     // Remover a classe para permitir reiniciar depois
     startScreen.classList.remove("fade-out");
 
-  }, 2000); // Tempo de espera para o fade-out
+  }, 3000); // Tempo de espera para o fade-out
 }
 
 function nextStory() {
@@ -91,6 +119,62 @@ function nextStory() {
     pathIndex++;
     if (pathIndex < currentPath.length) {
       storyText.textContent = currentPath[pathIndex];
+
+      if (currentPath[pathIndex] === "Parece que o jogo acabou...") {
+        const luzBtn = document.getElementById("Medroso");
+        luzBtn.classList.remove("hidden");
+        luzBtn.classList.add("visible");
+        heart.currentTime = 0;
+        heart.play();
+        startFnafChaos();
+        
+        return; // Para impedir que o botão avance mais a história
+      }
+      if (currentPath[pathIndex] === "Você quer ir?") {
+        // Oculta o botão de próximo passo e mostra os novos botões
+        nextBtn.classList.add("hidden");
+        choicesDiv.classList.add("hidden"); // Se necessário, oculta o container antigo
+      
+        const newGameButtons = document.getElementById("new-game-buttons");
+        newGameButtons.style.display = "block"; // Torna os novos botões visíveis
+      
+        // Define ações para os botões
+        const yesButton = document.getElementById("yes");
+        const noButton = document.getElementById("no");
+      
+        // Ação para o botão "Sim"
+        yesButton.onclick = () => {
+          currentPath = [ // Novo caminho para o "Sim"
+            "Você decide ajudar a voz desconhecida.",
+            "Você toca na parede, ela começa a tremer...",
+            "Uma luz intensa surge, e você ouve uma risada distante.",
+            "Algo mudou... para sempre."
+          ];
+          pathIndex = 0;
+          storyText.textContent = currentPath[pathIndex];
+      
+          // Oculta os botões e mostra o botão de próximo passo
+          newGameButtons.style.display = "none";
+          nextBtn.classList.remove("hidden");
+        };
+      
+        // Ação para o botão "Não"
+        noButton.onclick = () => {
+          currentPath = [ // Novo caminho para o "Não"
+            "Você decide não confiar na voz misteriosa.",
+            "Você corre para longe da voz.",
+            "Você entra na cozinha... Mas..",
+            "Quando você abre a porta, você vê muitos monstros... te observando...",
+            "Parece que o jogo acabou..."
+          ];
+          pathIndex = 0;
+          storyText.textContent = currentPath[pathIndex];
+      
+          // Oculta os botões e mostra o botão de próximo passo
+          newGameButtons.style.display = "none";
+          nextBtn.classList.remove("hidden");
+        };
+      }
 
       // Verifica a frase para aplicar ou remover o fundo
       if (storyText.textContent === "Você liga sua lanterna, olha para a porta com medo.") {
@@ -105,6 +189,13 @@ function nextStory() {
         heart.play();
       }
 
+      if (currentPath && currentPath[pathIndex] === "Quando você abre a porta, você vê muitos monstros... te observando...") {
+        mysterious.pause();
+        mysterious.currentTime = 0;
+        fear.currentTime = 0;
+        fear.play();
+      }
+
       if (storyText.textContent === "Mas eles não param. Pelo contrário, parecem mais próximos.") {
         newMusic.currentTime = 0;
         newMusic.play();
@@ -112,7 +203,6 @@ function nextStory() {
 
     } else {
       currentPath = null;
-      alert("Fim do jogo! Obrigado por jogar.");
       nextBtn.classList.add("hidden");
       bgMusic.pause();
       document.body.classList.remove('background-image'); // Limpa fundo ao final
@@ -153,11 +243,53 @@ function nextStory() {
   if (storyText.textContent === "Os sons param, você só escuta seu coração.") {
     bgMusic.pause();
     bgMusic.currentTime = 0; // Reseta a música
+    newMusic.pause();
+    newMusic.currentTime = 0
+    scaryMusic.pause();
+    scaryMusic.currentTime - 0;
   }
+
+  if (storyText.textContent === "A maçaneta da porta se move sozinha.") {
+    heart.currentTime = 0;
+    heart.play();
+  }
+
+  if (storyText.textContent === "Você sente mais medo..") {
+    enterFnaf4Mode();
+
+  }
+
   if (storyText.textContent === "Você chega na porta da sala, abre a porta e...") {
   startFnafScene();
   return;
-}
+ }
+  if (storyText.textContent === "Você começa a escutar outro som.") {
+    newMusic.currentTime = 0;
+    newMusic.play();
+  }
+  if (currentPath && currentPath[pathIndex] === "DESCONHECIDO: Oii, você mora aqui?") {
+    mysterious.currentTime = 0;
+    mysterious.play();
+    heart.pause();
+    heart.currentTime = 0;
+    newMusic.pause();
+    newMusic.currentTime = 0;
+  
+    typeWriter("DESCONHECIDO: Oii, você mora aqui?", storyText, 50);
+    return;
+  }
+  if (currentPath && currentPath[pathIndex] === "DESCONHECIDO: Não precisa ter medo, eu não vou te machucar!") {
+    typeWriter("DESCONHECIDO: Não precisa ter medo, eu não vou te machucar!", storyText, 50);
+    return;
+  }
+  
+  if (currentPath && currentPath[pathIndex] === "DESCONHECIDO: Eu to aqui! Presa na parede!") {
+    typeWriter("DESCONHECIDO: Eu to aqui! Presa na parede!", storyText, 50, () => {
+      storyText.classList.remove("typing-rosa");
+    });
+    return;
+  }
+
 }
 
 function showStory() {
@@ -229,51 +361,92 @@ function chooseOption2() {
   nextBtn.classList.remove("hidden");
 }
 
-
 backBtn.addEventListener("click", restartGame);
 function restartGame() {
-  // Esconde a tela do jogo
-  gameScreen.classList.add("hidden");
+  location.reload();
+}
 
-  // Resetando os dados do jogo
-  storyIndex = 0;
-  pathIndex = 0;
-  currentPath = null;
-  storyText.textContent = "";
-  fnafLightReveal.style.display = "none"; // Esconde a imagem com máscara
-  lanternOn = false;
-  choicesDiv.classList.add("hidden");
+function enterFnaf4Mode() {
+  // Esconde os elementos normais
+  storyText.classList.add("hidden");
   nextBtn.classList.add("hidden");
-  backBtn.classList.add("hidden");
+  choicesDiv.classList.add("hidden");
 
-  // Pausar todas as músicas e sons
-  bgMusic.pause();
-  bgMusic.currentTime = 0;
-  creepySound.pause();
-  creepySound.currentTime = 0;
-  scaryMusic.pause();
-  scaryMusic.currentTime = 0;
-  heart.pause();
-  heart.currentTime = 0;
-  newMusic.pause();
+  activateFlashlight(); // Ativa a lanterna
+  startFnaf4Mode();     // <<< CHAMA AQUI para mudar o fundo e mostrar botões
+  fnaf4();
+
+  // Mostra a tela FNAF 4
+  const fnaf4Screen = document.getElementById("fnaf4Screen");
+  fnaf4Screen.classList.remove("hidden");
+
+  // Toca o som de fundo assustador
   newMusic.currentTime = 0;
-  fnafMiniGameSound.pause();
-  fnafMiniGameSound.currentTime = 0;
-  // Exibe a tela de início novamente
-  startScreen.classList.remove("fade-out");
-  startScreen.style.opacity = "1"; // Garantir que a opacidade esteja 100%
+  newMusic.play();
+  scaryMusic.currentTime = 0;
+  scaryMusic.play();
+}
 
-  // Exibe a tela de início
-  startScreen.classList.remove("hidden");
+let fnafMode = false; // Só ativa quando estiver no modo FNaF
+const cameraContainer = document.getElementById('camera-container'); // Crie um div para a "câmera"
 
-  // Exibe o botão de "Voltar ao Início"
-  backBtn.classList.remove("hidden");
+function startFnaf4Mode() {
+  fnafMode = true;
+  document.body.style.backgroundImage = "url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/bc8fc28f-ccde-4aa6-816a-709b75c1627a/dbj04ha-4aac147b-8169-46ff-9b36-537293d205ad.jpg/v1/fill/w_1192,h_670,q_70,strp/fnaf_4_bedroom__fnaf___sfm__by_deuzfazbear_dbj04ha-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzIwIiwicGF0aCI6IlwvZlwvYmM4ZmMyOGYtY2NkZS00YWE2LTgxNmEtNzA5Yjc1YzE2MjdhXC9kYmowNGhhLTRhYWMxNDdiLTgxNjktNDZmZi05YjM2LTUzNzI5M2QyMDVhZC5qcGciLCJ3aWR0aCI6Ijw9MTI4MCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.wS0vd0adFLLCoA_4yFfyGBkbJFbWAwKvitzvjAgNfN0')"; // Muda o fundo para o quarto
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center";
 
-  // Restaura o estado da lanterna
-  flashlightOn = false;
-  fnafCanvas.removeEventListener("mousemove", moveLantern);
-  fnafCanvas.style.background = "black";  // Fica preto quando a lanterna estiver desligada
-  
+// Mostrar a tela de FNaF 4
+document.getElementById('fnaf4Screen').classList.remove('hidden');
+document.getElementById('flashlight-btn').classList.remove('hidden'); // Mostrar o botão da lanterna
+document.getElementById('btn-armario').classList.remove('hidden');
+document.getElementById('btn-esquerda').classList.remove('hidden');
+document.getElementById('btn-direita').classList.remove('hidden');
+
+  // Sons de fundo
+  newMusic.currentTime = 0;
+  newMusic.loop = true;
+  newMusic.play();
+  heart.currentTime = 0;
+  heart.play();
+
+  // Se o botão de lanterna for necessário, defina-o como visível
+  document.getElementById('flashlight-btn').classList.remove('hidden');
+}
+
+function fnaf4() {
+  // Monitorando o movimento do mouse para a câmera
+  document.addEventListener('mousemove', (e) => {
+    if (!fnafMode) return; // Só executa quando estiver no modo FNaF
+
+    const screenWidth = window.innerWidth;
+    const mouseX = e.clientX;
+
+    const centerThreshold = screenWidth * 0.33; // Divisão da tela
+
+    if (mouseX < centerThreshold) {
+      // Olhando para a esquerda
+      cameraContainer.style.backgroundImage = "url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/7/76/LeftHall.png/revision/latest?cb=20150730153347')";
+      cameraContainer.style.backgroundPosition = "center";
+    } else if (mouseX > screenWidth - centerThreshold) {
+      // Olhando para a direita
+      cameraContainer.style.backgroundImage = "url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fc/Righthall.png/revision/latest?cb=20150730170154')";
+      cameraContainer.style.backgroundPosition = "center";
+    } else {
+      // Olhando para frente (armário)
+      cameraContainer.style.backgroundImage = "url('https://pm1.aminoapps.com/6349/403babee5aa86102f1a4b4b51ac2cc9bb17fab00_hq.jpg')";
+      cameraContainer.style.backgroundPosition = "center";
+    }
+  });
+}
+
+function activateFlashlight() {
+  const flashlight = document.getElementById('flashlight');
+  flashlight.style.display = 'block';
+
+  document.addEventListener('mousemove', (e) => {
+    flashlight.style.background = `radial-gradient(circle 150px at ${e.clientX}px ${e.clientY}px, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.95) 80%)`;
+  });
 }
 
 const fnafScene = document.getElementById("fnaf4-scene");
@@ -337,22 +510,28 @@ const fnafScene = document.getElementById("fnaf4-scene");
       lightReveal.style.display = "none";
       // outras coisas que já ocorrem aqui, como resetar a história
     });
-
+  
     // Esconder imagem ao morrer e clicar em "tentar novamente"
     retryBtn.addEventListener("click", () => {
       lightReveal.style.display = "none";
     });
-
+  
     if (flashlightOn) {
       fnafCanvas.addEventListener("mousemove", moveLantern);
       fnafCanvas.style.background = "none";
       fnafLightReveal.style.display = "block"; // Mostra imagem de fundo iluminada
       lanternOn = true;
+  
+      // Adiciona a classe 'active' ao botão, alterando sua cor
+      flashlightBtn.classList.add("active");
     } else {
       fnafCanvas.removeEventListener("mousemove", moveLantern);
       fnafCanvas.style.background = "black";
       fnafLightReveal.style.display = "none"; // Esconde a imagem iluminada
       lanternOn = false;
+  
+      // Remove a classe 'active' para reverter a cor original
+      flashlightBtn.classList.remove("active");
     }
   
     if (flashlightOn) {
@@ -382,31 +561,52 @@ const fnafScene = document.getElementById("fnaf4-scene");
     scaryVideo.onended = () => {
       videoContainer.classList.add("hidden");
       deathScreen.classList.remove("hidden");
+    
+      const deathText = document.getElementById("death-text");
+      deathText.classList.remove("hidden"); // <-- mostra o texto
     };
   });
 
 
-function endFnafScene() {
-  fnafScene.classList.add("hidden");
-  gameScreen.classList.remove("hidden");
+  function endFnafScene() {
+    fnafScene.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+  
+    currentPath = postFnafLines;
+    pathIndex = 0;
+    storyText.textContent = currentPath[pathIndex];
+    nextBtn.classList.remove("hidden");
+  
+    fnafMiniGameSound.pause();
+    fnafMiniGameSound.currentTime = 0;
+  
+    fnafLightReveal.style.display = "none";
+    lanternOn = false;
+  }
 
-  storyText.textContent = "Você entra na sala, mas parece vazia... Por enquanto.";
-  nextBtn.classList.remove("hidden");
-  currentPath = null;
 
-  fnafMiniGameSound.pause();
-  fnafMiniGameSound.currentTime = 0;
-
-  fnafLightReveal.style.display = "none"; // <-- Adicionado aqui
-  lanternOn = false;
-}
-
-
-function moveLantern(e) {
-  const x = e.clientX;
-  const y = e.clientY;
-  fnafCanvas.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.85) 200px, rgba(0,0,0,1) 400px)`;
-}
+  function moveLantern(e) {
+    const x = e.clientX;
+    const y = e.clientY;
+    fnafCanvas.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.85) 200px, rgba(0,0,0,1) 400px)`;
+  
+    if (lanternOn) {
+      const buttons = document.querySelectorAll(".chaos-button");
+  
+      buttons.forEach((btn) => {
+        const rect = btn.getBoundingClientRect();
+        const btnX = rect.left + rect.width / 2;
+        const btnY = rect.top + rect.height / 2;
+  
+        const distance = Math.sqrt((x - btnX) ** 2 + (y - btnY) ** 2);
+        if (distance < 100) {
+          btn.classList.add("visible");
+        } else {
+          btn.classList.remove("visible");
+        }
+      });
+    }
+  }
 
 retryBtn.addEventListener("click", () => {
   deathScreen.classList.add("hidden");
@@ -423,3 +623,319 @@ document.addEventListener("mousemove", (e) => {
     fnafLightReveal.style.setProperty("--y", `${y}px`);
   }
 });
+
+function typeWriter(text, element, speed = 100, callback = null) {
+  let i = 0;
+  element.textContent = "";
+  element.classList.add("typing-rosa"); // Adiciona a cor rosa
+
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    } else {
+      if (callback) {
+        callback();
+      }
+    }
+  }
+
+  type();
+}
+
+let cowardLightOn = false;
+let buttonsCreated = false;
+let countdownTimer;
+let isButtonClicked = false;
+let countdownStarted = false;
+const medrosoBtn = document.getElementById("Medroso");
+
+if (medrosoBtn) {
+  medrosoBtn.addEventListener("click", toggleCowardLight);
+} else {
+  console.error("Botão Medroso não encontrado no DOM!");
+}
+
+function startFnafChaos() {
+  const medrosoBtn = document.getElementById("Medroso");
+
+  if (medrosoBtn) {
+    nextBtn.classList.add("hidden");
+    storyText.textContent = "Rápido! Aperte algum botão!";
+    
+    medrosoBtn.classList.remove("hidden");
+    medrosoBtn.style.pointerEvents = "auto";
+
+    if (!document.getElementById("chaos-container")) {
+      const chaosContainer = document.createElement("div");
+      chaosContainer.id = "chaos-container";
+      chaosContainer.style.position = "absolute";
+      chaosContainer.style.top = "0";
+      chaosContainer.style.left = "0";
+      chaosContainer.style.width = "100%";
+      chaosContainer.style.height = "100%";
+      chaosContainer.style.zIndex = "9999";
+      chaosContainer.classList.add("chaos-visible");
+      gameScreen.appendChild(chaosContainer);
+    }
+  } else {
+    console.error("Botão Medroso não encontrado na função startFnafChaos!");
+  }
+}
+
+function toggleCowardLight() {
+  console.log("Botão Luz foi clicado!"); // Adiciona um log para depuração
+  cowardLightOn = !cowardLightOn;
+  
+  const medrosoBtn = document.getElementById("Medroso");
+  const cozinha = document.getElementById("cozinha");
+
+  if (medrosoBtn) {
+    medrosoBtn.classList.toggle("active", cowardLightOn);
+  }
+
+  cozinha.style.display = cowardLightOn ? "block" : "none";
+  
+  if (cowardLightOn && !buttonsCreated) {
+    createChaosButtons();
+    buttonsCreated = true;
+  }
+
+  if (cowardLightOn) {
+    document.addEventListener("mousemove", followMouse);
+    if (!countdownStarted) {
+      startCountdown();  // Inicia a contagem regressiva quando a luz for ativada
+      countdownStarted = true;
+    }
+  } else {
+    document.removeEventListener("mousemove", followMouse);
+  }
+}
+
+function createChaosButtons() {
+  const chaosContainer = document.getElementById("chaos-container");
+
+  // Primeiro criamos o botão especial escondido
+  const specialButton = document.createElement("button");
+  specialButton.textContent = "APERTE"; // igual aos outros
+  specialButton.className = "chaos-button special"; // adiciona uma classe especial
+  specialButton.style.position = "absolute";
+  specialButton.style.top = `${Math.random() * 90}%`;
+  specialButton.style.left = `${Math.random() * 90}%`;
+  specialButton.style.padding = "10px 20px";
+  specialButton.style.fontSize = "1.2rem";
+  specialButton.dataset.reveal = "false";
+
+  specialButton.addEventListener("click", () => {
+    chaosContainer.remove(); // tira o caos
+    stopBackgroundAndLanternEffect(); // chama a função para parar a imagem e o efeito de lanterna
+    continueStoryFromSpecialButton(); // chama a função para continuar a história
+  });
+
+  chaosContainer.appendChild(specialButton);
+
+  // Agora criamos os outros botões normais
+  for (let i = 0; i < 29; i++) { // 29 porque já criamos 1 especial
+    const btn = document.createElement("button");
+    btn.textContent = "APERTE";
+    btn.className = "chaos-button";
+    btn.style.position = "absolute";
+    btn.style.top = `${Math.random() * 90}%`;
+    btn.style.left = `${Math.random() * 90}%`;
+    btn.style.padding = "10px 20px";
+    btn.style.fontSize = "1.2rem";
+    btn.dataset.reveal = "false";
+
+    btn.addEventListener("click", () => {
+      chaosContainer.remove();
+      showCowardEnding(); // clica num normal, vai para o final medroso
+    });
+
+    chaosContainer.appendChild(btn);
+  }
+}
+
+function stopBackgroundAndLanternEffect() {
+  // Parar o efeito da lanterna
+  document.removeEventListener("mousemove", followMouse);  // Remove o evento de movimento do mouse
+
+  // Parar a animação da lanterna (caso você tenha alguma animação CSS)
+  const cozinha = document.getElementById("cozinha");
+  cozinha.style.display = "none"; // Esconde a imagem da lanterna ou desativa o efeito
+
+  const chaosContainer = document.getElementById("chaos-container");
+  if (chaosContainer) chaosContainer.remove();
+
+  // Se houver uma camada de fundo específica, você também pode removê-la:
+  const backgroundLayer = document.getElementById("background-layer");
+  if (backgroundLayer) {
+    backgroundLayer.style.display = "none"; // Esconde a camada de fundo
+  }
+
+  // Parar a contagem regressiva
+  clearInterval(countdownTimer);  // Limpa o intervalo da contagem regressiva
+  const countdownDisplay = document.getElementById("countdown-display");
+  if (countdownDisplay) {
+    countdownDisplay.textContent = "Contagem regressiva interrompida";  // Exibe uma mensagem indicando que a contagem foi interrompida
+  }
+
+  // Parar as músicas
+  const musicElements = [
+    bgMusic,
+    creepySound,
+    scaryMusic,
+    heart,
+    newMusic,
+    fnafMiniGameSound,
+    mysterious,
+    fear
+  ];
+
+  // Interrompe todas as músicas que estão tocando
+  musicElements.forEach(music => {
+    if (music && !music.paused) {
+      music.pause();  // Pausa a música
+      music.currentTime = 0;  // Reseta o tempo da música para o início
+    }
+  });
+
+    // Esconde o botão "Luz"
+    const medrosoBtn = document.getElementById("Medroso");
+    if (medrosoBtn) {
+      medrosoBtn.style.display = "none"; // Isso vai esconder o botão "Luz"
+    }
+}
+
+function followMouse(e) {
+  const cozinha = document.getElementById("cozinha");
+  cozinha.style.setProperty('--x', `${e.clientX}px`);
+  cozinha.style.setProperty('--y', `${e.clientY}px`);
+
+  const buttons = document.querySelectorAll(".chaos-button");
+
+  buttons.forEach((btn) => {
+    const rect = btn.getBoundingClientRect();
+    const btnX = rect.left + rect.width / 2;
+    const btnY = rect.top + rect.height / 2;
+    const distance = Math.sqrt((e.clientX - btnX) ** 2 + (e.clientY - btnY) ** 2);
+
+    if (distance < 100) {
+      btn.classList.add("visible"); // Torna o botão visível
+    } else {
+      btn.classList.remove("visible"); // Torna o botão invisível
+    }
+  });
+}
+
+let cowardEndingStarted = false; // <- variável de controle no começo do seu script
+
+function showCowardEnding() {
+  if (cowardEndingStarted) return; // Se já chamou, não chama de novo
+  cowardEndingStarted = true; // Marca que já começou
+
+  gameScreen.classList.add("hidden");
+  
+  // Pausa as músicas
+  bgMusic.pause();
+  creepySound.pause();
+  scaryMusic.pause();
+  heart.pause();
+  newMusic.pause();
+  fnafMiniGameSound.pause();
+  mysterious.pause();
+  fear.pause();
+
+  // Exibe o vídeo
+  const videoContainer = document.getElementById("gameover-video-container");
+  const video = document.getElementById("gameover-video");
+
+  videoContainer.classList.remove("hidden");
+  video.currentTime = 0; // Garante que o vídeo comece do início
+  video.play();
+
+  // Quando o vídeo terminar, mostra a tela final
+  video.onended = () => {
+    videoContainer.classList.add("hidden");
+    const cowardEnding = document.getElementById("coward-ending");
+    cowardEnding.classList.remove("hidden");
+
+    const gameOverMusic = document.getElementById("game-over-music");
+    gameOverMusic.play();
+  };
+}
+
+
+// Ligação dos botões
+const backToStartBtn = document.getElementById("back-to-start-btn");
+backToStartBtn.addEventListener("click", () => {
+  document.getElementById("coward-ending").classList.add("hidden");
+  restartGame();
+});
+
+// Função que inicia a contagem regressiva
+function startCountdown() {
+  const timeLimit = 10; // 10 segundos de contagem
+  let remainingTime = timeLimit;
+  
+  // Exibe a contagem regressiva na tela ou no console
+  const countdownDisplay = document.getElementById("countdown-display");
+  countdownDisplay.textContent = `Tempo restante: ${remainingTime}s`;
+
+  // Atualiza a contagem a cada segundo
+  countdownTimer = setInterval(() => {
+    remainingTime--;
+    countdownDisplay.textContent = `Tempo restante: ${remainingTime}s`;
+
+    if (remainingTime <= 0) {
+      clearInterval(countdownTimer);
+      if (!isButtonClicked) {
+        showCowardEnding(); // Chama a função showCowardEnding em vez de showGameOver
+      }
+    }
+  }, 1000);
+}
+
+// Função chamada quando qualquer botão é clicado
+function onButtonClick() {
+  isButtonClicked = true;
+  clearInterval(countdownTimer); // Interrompe a contagem regressiva
+  // Continue com o fluxo normal, por exemplo, avançar na história ou cena
+  // Exemplo: nextStory();
+}
+
+// Adicionando o evento de clique para os botões de caos
+document.querySelectorAll(".chaos-button").forEach((button) => {
+  button.addEventListener("click", onButtonClick);
+});
+
+function continueStoryFromSpecialButton() {
+  const gameOverMusic = document.getElementById("game-over-music");
+  gameOverMusic.play();
+  // Esconde a tela de caos
+  const chaosContainer = document.getElementById("chaos-container");
+  if (chaosContainer) chaosContainer.remove();
+
+  // Reseta o estado
+  clearInterval(countdownTimer);
+  isButtonClicked = true;
+
+  // Exibe a frase da história
+  const storyText = document.getElementById("story-text");
+  storyText.textContent = "Inacreditável! Você sobreviveu a todos os monstros, pulou pela janela e foi correndo o mais distânte possível da mansão.";
+
+  // Esconde o botão de avanço
+  const nextBtn = document.getElementById("next-btn");
+  if (nextBtn) nextBtn.classList.add("hidden");
+
+  // Exibe a tela de "Fim Sortudo"
+  const gameOverScreen = document.createElement("div");
+  gameOverScreen.className = "game-over-screen";
+  gameOverScreen.innerHTML = `
+    <section>
+    <h2>Final Sortudo</h2>
+    </section>
+    <h3>Parabens 🎉🎉✨</h3>
+  `;
+  document.body.appendChild(gameOverScreen);
+}

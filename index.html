@@ -20,22 +20,62 @@
     </div>
     <button id="next-btn">Avançar</button>
     <button id="back-btn">↩ Voltar no início</button>
+  
+    <!-- Coloque o botão aqui dentro -->
+    <button id="Medroso" class="hidden" style="z-index:10001; position:fixed; top:20px; right:20px;">Luz</button>
   </div>
+  <div id="flashlight"></div>
+  <div id="cozinha"></div>
   <div id="fnaf4-scene" class="hidden">
     <div id="fnaf4-canvas">
       <button id="flashlight-btn">Lanterna</button>
       <button id="danger-btn" class="hidden">APERTE</button>
     </div>
+    <div id="fnaf4Scree" class="hidden">
+      <div id="fnaf-buttons">
+        <button id="door1Btn" class="door-btn left">Porta 1</button>
+        <button id="closetBtn" class="closet-btn">Armário</button>
+        <button id="door2Btn" class="door-btn right">Porta 2</button>
+      </div>
+    </div>
+    <div id="camera-container" class="hidden">
+      <!-- Aqui aparece o fundo mudando -->
+    </div>
+    
+    <!-- Botões -->
+    <button id="btn-armario" class="hidden">Ir para o Armário</button>
+    <button id="btn-esquerda" class="hidden">Ir para a Porta Esquerda</button>
+    <button id="btn-direita" class="hidden">Ir para a Porta Direita</button>
   </div>
   <div id="fnafLightReveal"></div>
   <div id="death-screen" class="hidden">
+    <h1 id="death-text" class="hidden">VOCÊ MORREU!</h1>
     <button id="retry-btn">Tentar novamente</button>
   </div>
   <div id="video-container" class="hidden">
     <video id="scary-video" width="100%" height="100%" autoplay>
       <source src="ALL JUMP SCARES and Scary Moments in Resident Evil 7_ Biohazard - YouTube e mais 2 páginas - Perfil 1 — Microsoft​ Edge 25_04_2025 16_33_23_Trim.mp4" type="video/mp4">
-      Seu navegador não suporta vídeo em HTML5.
     </video>
+  </div>
+  <div id="new-game-buttons" style="display: none;">
+    <button id="yes">Sim</button>
+    <button id="no">Não</button>
+  </div>
+  <div id="countdown-display" style="position: absolute; top: 10px; left: 10px; color: white; font-size: 1.5rem;"></div>
+  <div id="gameover-video-container" class="hidden">
+    <video id="gameover-video" width="100%" height="100%">
+      <source src="[FNAF SFM] Five Night's at Freddy's 4 All Jumpscare's Animation - YouTube e mais 3 páginas - Perfil 1 — Microsoft​ Edge 27_04_2025 18_43_48_Trim_Trim.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div id="coward-ending" class="hidden">
+    <div class="ending-text">
+      <section>
+        <h2 id="ending-title">Final Medroso</h2>
+      </section>
+      <h1 id="ending-main">Gamer Ouver</h1>
+      <button id="back-to-start-btn">Voltar ao Início</button>
+      <div id="coward-light-effect"></div>
+    </div>
   </div>
   <audio id="bg-music" loop>
     <source src="Undertale OST： 028 - Premonition.mp3" type="audio/mp3">
@@ -59,6 +99,22 @@
   
   <audio id="fnaf-mini-game-sound" loop>
     <source src="Menina assustadora falando ｜ Sons de terror com voz assustadora.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="mysterious" loop>
+    <source src="Undertale OST： 020 - Mysterious Place.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="game-over-music" loop>
+    <source src="Undertale OST_ 011 - Determination [W1i4mTyidOc].mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="theme" loop>
+    <source src="FNAF 4 OST 03 - Ambiance 2.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="intro-music" loop>
+    <source src="FNAF 4： Main Menu Theme (1).mp3" type="audio/mp3">
   </audio>
 
   <script src="script.js"></script>
