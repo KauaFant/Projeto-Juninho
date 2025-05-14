@@ -75,9 +75,11 @@ const postFnafLines = [
   "Você quer ir?"
 ];
 
-const evilEnd = {
+const quarto = [ 
+  "Exelente!, você trancou a porta",
+  "Mesmo com a porta trancada, você ainda sente medo.."
+];
 
-}
 
 // Eventos
 startBtn.addEventListener("click", startGame);
@@ -380,8 +382,6 @@ function iniciarMiniGame() {
   const player = document.getElementById("player");
   const chave = document.getElementById("chave");
   const porta = document.getElementById("porta");
-  const bonnie = document.getElementById("bonnie")
-
   let posX = 50;
   let posY = 20;
   let chaveColetada = false;
@@ -389,20 +389,13 @@ function iniciarMiniGame() {
   const limiteX = { min: 0, max: window.innerWidth - 50 };
   const limiteY = { min: 0, max: window.innerHeight - 50 };
 
-  // Função para verificar colisões
   function verificarColisao(a, b) {
     const aRect = a.getBoundingClientRect();
     const bRect = b.getBoundingClientRect();
-
-    return !(
-      aRect.right < bRect.left ||
-      aRect.left > bRect.right ||
-      aRect.bottom < bRect.top ||
-      aRect.top > bRect.bottom
-    );
+    return !(aRect.right < bRect.left || aRect.left > bRect.right || aRect.bottom < bRect.top || aRect.top > bRect.bottom);
   }
 
-  document.addEventListener("keydown", (e) => {
+  const handleKeydown = (e) => {
     switch (e.key) {
       case "ArrowLeft":
         posX = Math.max(limiteX.min, posX - 10);
@@ -421,68 +414,51 @@ function iniciarMiniGame() {
     player.style.left = posX + "px";
     player.style.bottom = posY + "px";
 
-    // Coletando a chave
-    if (!chaveColetada && verificarColisao(player, chave)) {
-      chaveColetada = true;
-      chave.style.display = "none";  // A chave desaparece quando coletada
+    const bonnieTocado = Array.from(document.querySelectorAll(".bonnie")).some(bonnie =>
+      verificarColisao(player, bonnie)
+    );
+
+    if (bonnieTocado) {
+      document.getElementById("minigame-room").classList.add("hidden");
+      const videoContainer = document.getElementById("videodobonnie");
+      const videobonnie = document.getElementById("videobonnie");
+      const deathScreen = document.getElementById("death-screen");
+      const deathText = document.getElementById("death-text");
+
+      videoContainer.classList.remove("hidden");
+      videobonnie.play();
+
+      videobonnie.onended = () => {
+        videoContainer.classList.add("hidden");
+        deathScreen.classList.remove("hidden");
+        deathText.classList.remove("hidden");
+      };
+      document.removeEventListener("keydown", handleKeydown);
+      return;
     }
 
-    // Verificando se o jogador está perto da porta
+    if (!chaveColetada && verificarColisao(player, chave)) {
+      chaveColetada = true;
+      chave.style.display = "none";
+    }
+
     if (verificarColisao(player, porta)) {
       if (chaveColetada) {
         alert("Você destrancou a porta e saiu da sala!");
         document.getElementById("minigame-room").classList.add("hidden");
         gameScreen.classList.remove("hidden");
-        currentPath = postFnafLines;  // Caminho para continuar a história
+        currentPath = quarto;
         pathIndex = 0;
         storyText.textContent = currentPath[pathIndex];
         nextBtn.classList.remove("hidden");
+        document.removeEventListener("keydown", handleKeydown);
       } else {
         alert("A porta está trancada. Encontre a chave!");
       }
     }
-    document.querySelectorAll(".bonnie").forEach(bonnie => {
-      if (verificarColisao(player, bonnie)) {
-        // Oculta o minigame
-        document.getElementById("minigame-room").classList.add("hidden");
+  };
 
-        // Mostra o vídeo de susto
-        const videoContainer = document.getElementById("video-container");
-        const scaryVideo = document.getElementById("scary-video");
-        const deathScreen = document.getElementById("death-screen");
-        const deathText = document.getElementById("death-text");
-
-        videoContainer.classList.remove("hidden");
-        scaryVideo.play();
-
-        // Ao final do vídeo, mostra a tela de morte
-        scaryVideo.onended = () => {
-          videoContainer.classList.add("hidden");
-          deathScreen.classList.remove("hidden");
-          deathText.classList.remove("hidden");
-        };
-      }
-    });
-  });
-
-  // Botão para sair do minigame
-  setTimeout(() => {
-    const btn = document.createElement("button");
-    btn.textContent = "Avançar";
-    btn.style.position = "absolute";
-    btn.style.bottom = "20px";
-    btn.style.right = "20px";
-    btn.style.zIndex = "9999";
-    btn.onclick = () => {
-      document.getElementById("minigame-room").classList.add("hidden");
-      gameScreen.classList.remove("hidden");
-      currentPath = postFnafLines; // ou qualquer caminho que você deseja continuar
-      pathIndex = 0;
-      storyText.textContent = currentPath[pathIndex];
-      nextBtn.classList.remove("hidden");
-    };
-    document.getElementById("minigame-room").appendChild(btn);
-  }, 20000); // 15 segundos para mostrar o botão "Avançar"
+  document.addEventListener("keydown", handleKeydown);
 }
 
 const fnafScene = document.getElementById("fnaf4-scene");
@@ -519,7 +495,7 @@ const fnafScene = document.getElementById("fnaf4-scene");
     // Começa o cronômetro para continuar história se jogador não apertar o botão
     dangerTimeout = setTimeout(() => {
       endFnafScene(); // Aqui você vai terminar a cena FNaF caso o jogador não clique a tempo
-    }, 30000); // 30 segundos
+    }, 18000); // 18 segundos
   }
 
   fnafCanvas.addEventListener("mousemove", (e) => {
@@ -557,17 +533,19 @@ const fnafScene = document.getElementById("fnaf4-scene");
       fnafCanvas.style.background = "none";
       fnafLightReveal.style.display = "block"; // Mostra imagem de fundo iluminada
       lanternOn = true;
-  
-      // Adiciona a classe 'active' ao botão, alterando sua cor
       flashlightBtn.classList.add("active");
+    
+      // Esconde o cursor
+      fnafCanvas.style.cursor = "none";
     } else {
       fnafCanvas.removeEventListener("mousemove", moveLantern);
       fnafCanvas.style.background = "black";
       fnafLightReveal.style.display = "none"; // Esconde a imagem iluminada
       lanternOn = false;
-  
-      // Remove a classe 'active' para reverter a cor original
       flashlightBtn.classList.remove("active");
+    
+      // Mostra o cursor novamente
+      fnafCanvas.style.cursor = "default";
     }
   
     if (flashlightOn) {

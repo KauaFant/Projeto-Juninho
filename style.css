@@ -657,30 +657,38 @@ section {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-image: url('https://pm1.aminoapps.com/7043/7a0a1105b1af6e1e8bdf66f54c5fa2cc45263374r1-720-720v2_hq.jpg'); /* imagem do quarto */
+  background-image: url('https://i.pinimg.com/originals/8a/e8/26/8ae826dba6a224dba3e49bf045583254.gif'); /* imagem do quarto */
   background-size: cover;
   overflow: hidden;
 }
 
 #player {
   position: absolute;
-  width: 200px;
-  height: 200px;
-  background-image: url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927'); /* personagem */
-  background-size: contain;
-  background-repeat: no-repeat;
+  width: 100px;  /* hitbox */
+  height: 100px;
   left: 50px;
   bottom: 20px;
+  overflow: visible; /* permite a imagem passar dos limites */
 }
 
+#player .sprite {
+  width: 150px; /* tamanho visual */
+  height: 150px;
+  background-image: url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927');
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
 #chave {
   position: absolute;
-  width: 45px;
-  height: 45px;
-  background-image: url('https://w7.pngwing.com/pngs/656/557/png-transparent-key-along-skeleton-key-art-thumbnail.png'); /* Imagem da chave */
+  width: 60px;
+  height: 60px;
+  background-image: url('https://sdmntprsouthcentralus.oaiusercontent.com/files/00000000-f134-61f7-af25-8d96506baa40/raw?se=2025-05-14T20%3A09%3A37Z&sp=r&sv=2024-08-04&sr=b&scid=00000000-0000-0000-0000-000000000000&skoid=c953efd6-2ae8-41b4-a6d6-34b1475ac07c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-14T12%3A10%3A39Z&ske=2025-05-15T12%3A10%3A39Z&sks=b&skv=2024-08-04&sig=92jXTjpXQixlbXxNLAnHySTdnmPHis/d%2BzQ17rcMAqc%3D'); /* Imagem da chave */
   background-size: cover;
-  left: 500px; /* posição da chave */
-  bottom: 100px;
+  left: 800px; /* posição da chave */
+  bottom: 400px;
   z-index: 5;
 }
 
@@ -702,4 +710,23 @@ section {
   background-image: url('https://media.tenor.com/mz4rNFNJT1kAAAAj/rwqfsfasxc-fnaf.gif');
   background-size: cover;
   z-index: 3;
+}
+
+#videobonnie {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#videodobonnie {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
 }
