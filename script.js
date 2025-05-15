@@ -19,11 +19,9 @@ const fnafLightReveal = document.getElementById("fnafLightReveal");
 const mysterious = document.getElementById("mysterious");
 const fear = document.getElementById("theme");
 const intro = document.getElementById("intro-music");
+const run = document.getElementById("run");
 
 
-//ambientFnafSound.currentTime = 0;
-//ambientFnafSound.loop = true;
-//ambientFnafSound.play();
 
 let storyIndex = 0;
 let currentPath = null;
@@ -77,7 +75,10 @@ const postFnafLines = [
 
 const quarto = [ 
   "Exelente!, você trancou a porta",
-  "Mesmo com a porta trancada, você ainda sente medo.."
+  "Mesmo com a porta trancada, você ainda sente medo..",
+  "As paredes do quarto ficam mais escuras",
+  "Parece que quarto não é mais seguro..",
+  "Você sai do quarto"
 ];
 
 
@@ -127,6 +128,13 @@ function nextStory() {
     pathIndex++;
     if (pathIndex < currentPath.length) {
       storyText.textContent = currentPath[pathIndex];
+
+      // Verifica a frase para iniciar o minigame
+      if (currentPath[pathIndex] === "Você sai do quarto") {
+        gameScreen.classList.add("hidden"); // Esconde a tela do jogo
+        startChaseMinigame(); // Inicia o novo minigame
+        return; // Para a progressão da história
+      }
 
       if (currentPath[pathIndex] === "Parece que o jogo acabou...") {
         const luzBtn = document.getElementById("Medroso");
@@ -254,7 +262,7 @@ function nextStory() {
     newMusic.pause();
     newMusic.currentTime = 0
     scaryMusic.pause();
-    scaryMusic.currentTime - 0;
+    scaryMusic.currentTime = 0; // Corrigido de '-' para '='
   }
 
   if (storyText.textContent === "A maçaneta da porta se move sozinha.") {
@@ -272,9 +280,9 @@ function nextStory() {
   }
 
   if (storyText.textContent === "Você chega na porta da sala, abre a porta e...") {
-  startFnafScene();
-  return;
- }
+    startFnafScene();
+    return;
+  }
   if (storyText.textContent === "Você começa a escutar outro som.") {
     newMusic.currentTime = 0;
     newMusic.play();
@@ -301,7 +309,6 @@ function nextStory() {
     });
     return;
   }
-
 }
 
 function showStory() {
@@ -459,6 +466,193 @@ function iniciarMiniGame() {
   };
 
   document.addEventListener("keydown", handleKeydown);
+}
+
+function startChaseMinigame() {
+  const canvas = document.getElementById("chase-minigame");
+  const ctx = canvas.getContext("2d");
+  canvas.classList.remove("hidden");
+
+  run.loop = true;
+  run.play();
+
+  // Pausar músicas existentes
+  [bgMusic, creepySound, scaryMusic, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+
+  const player = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    width: 60,
+    height: 60,
+    speed: 3.5,
+    color: "#00ff00"
+  };
+
+  const enemy = {
+    x: 50,
+    y: 50,
+    width: 60,
+    height: 60,
+    speed: 2,
+    color: "#ff0000"
+  };
+
+  const key = {
+    x: 100,
+    y: 300,
+    width: 30,
+    height: 30,
+    collected: false
+  };
+
+  const door = {
+    x: canvas.width - 100,
+    y: canvas.height / 2 - 40,
+    width: 40,
+    height: 80,
+    opened: false
+  };
+
+  let hasKey = false;
+
+  const keys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false
+  };
+
+  function handleKeydown(e) {
+    if (e.key in keys) keys[e.key] = true;
+  }
+
+  function handleKeyup(e) {
+    if (e.key in keys) keys[e.key] = false;
+  }
+
+  document.addEventListener("keydown", handleKeydown);
+  document.addEventListener("keyup", handleKeyup);
+
+  function checkCollision(a, b) {
+    return (
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y
+    );
+  }
+
+  function updateEnemy() {
+    const dx = player.x - enemy.x;
+    const dy = player.y - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance > 0) {
+      enemy.x += (dx / distance) * enemy.speed;
+      enemy.y += (dy / distance) * enemy.speed;
+    }
+  }
+
+  const playerImage = new Image();
+  playerImage.src = "https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927";
+
+  const enemyImage = new Image();
+  enemyImage.src = "https://static.wikia.nocookie.net/fnafapedia/images/e/e7/Spring_Freddy_Chomping.gif/revision/latest/scale-to-width-down/250?cb=20240106173010";
+
+  const keyImage = new Image();
+  keyImage.src = "https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif";
+
+  const doorImage = new Image();
+  doorImage.src = "https://st.depositphotos.com/50990794/58333/v/450/depositphotos_583338808-stock-illustration-wooden-door-pixel-art-wood.jpg"
+
+  function gameLoop() {
+    // Movimentação do jogador
+    if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
+    if (keys.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
+    if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
+    if (keys.ArrowRight && player.x < canvas.width - player.width) player.x += player.speed;
+
+    updateEnemy();
+
+    // Verificar colisão com inimigo
+    if (checkCollision(player, enemy)) {
+      endMinigame();
+      showDeathScreen();
+      return;
+    }
+
+    // Verificar colisão com chave
+    if (!key.collected && checkCollision(player, key)) {
+      key.collected = true;
+      hasKey = true;
+    }
+
+    // Verificar colisão com porta
+    if (checkCollision(player, door)) {
+      if (hasKey) {
+        endMinigame();
+        alert("Você escapou com sucesso!");
+        return;
+      }
+    }
+
+    // Limpar tela
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Desenhar jogador
+    if (playerImage.complete) {
+      ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+    } else {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Desenhar inimigo
+    if (enemyImage.complete) {
+      ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+    } else {
+      ctx.fillStyle = enemy.color;
+      ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
+
+    // Desenhar chave
+    if (!key.collected) {
+      if (keyImage.complete) {
+        ctx.drawImage(keyImage, key.x, key.y, key.width, key.height);
+      } else {
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(key.x, key.y, key.width, key.height);
+      }
+    }
+
+    // Desenhar porta
+    if (doorImage.complete) {
+      ctx.drawImage(doorImage, door.x, door.y, door.width, door.height);
+    } else {
+      ctx.fillStyle = "brown";
+      ctx.fillRect(door.x, door.y, door.width, door.height);
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
+
+  function endMinigame() {
+    canvas.classList.add("hidden");
+    document.removeEventListener("keydown", handleKeydown);
+    document.removeEventListener("keyup", handleKeyup);
+    run.pause();
+    run.currentTime = 0;
+  }
+
+  function showDeathScreen() {
+    deathScreen.classList.remove("hidden");
+    const deathText = document.getElementById("death-text");
+    deathText.classList.remove("hidden");
+  }
 }
 
 const fnafScene = document.getElementById("fnaf4-scene");

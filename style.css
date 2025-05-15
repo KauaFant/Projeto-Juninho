@@ -681,11 +681,12 @@ section {
   bottom: 0;
   left: 0;
 }
+
 #chave {
   position: absolute;
   width: 60px;
   height: 60px;
-  background-image: url('https://sdmntprsouthcentralus.oaiusercontent.com/files/00000000-f134-61f7-af25-8d96506baa40/raw?se=2025-05-14T20%3A09%3A37Z&sp=r&sv=2024-08-04&sr=b&scid=00000000-0000-0000-0000-000000000000&skoid=c953efd6-2ae8-41b4-a6d6-34b1475ac07c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-05-14T12%3A10%3A39Z&ske=2025-05-15T12%3A10%3A39Z&sks=b&skv=2024-08-04&sig=92jXTjpXQixlbXxNLAnHySTdnmPHis/d%2BzQ17rcMAqc%3D'); /* Imagem da chave */
+  background-image: url('https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif'); /* Imagem da chave */
   background-size: cover;
   left: 800px; /* posição da chave */
   bottom: 400px;
@@ -729,4 +730,13 @@ section {
   justify-content: center;
   align-items: center;
   z-index: 10000;
+}
+
+#chase-minigame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  background-color: #1a1a1a;
 }
