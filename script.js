@@ -78,9 +78,26 @@ const quarto = [
   "Mesmo com a porta trancada, você ainda sente medo..",
   "As paredes do quarto ficam mais escuras",
   "Parece que quarto não é mais seguro..",
-  "Você sai do quarto"
+  "Melhor ir pro corredor e subir para o sótão",
+  "Você sai do quarto.."
 ];
 
+const sotao = [
+  "Assustado!! Você chegou ao sótão",
+  "O ambiente esta escuro, você começa escutar barulhos estranhos",
+  "Parecem sussurros pedindo por ajuda",
+  "Com a lanterna ligada, você começa a procurar a fonte da voz.."
+]
+
+const sotao2 = [
+  "Você se assusta com o que acabou de ver",
+  "Pois isso lhe lembra muito o que acabou de segui-lo",
+  "Mas ele não aparenta ser perigoso e parece estar danificado",
+  "Você se aproxima para checar",
+  "Nesse momento, ele se levanta e vem em sua direção pedindo ajuda",
+  "Você cai para trás, assustado, e avista um taco de beisebol",
+  "Você se vê diante a um impasse"
+]
 
 // Eventos
 startBtn.addEventListener("click", startGame);
@@ -130,7 +147,7 @@ function nextStory() {
       storyText.textContent = currentPath[pathIndex];
 
       // Verifica a frase para iniciar o minigame
-      if (currentPath[pathIndex] === "Você sai do quarto") {
+      if (currentPath[pathIndex] === "Você sai do quarto..") {
         gameScreen.classList.add("hidden"); // Esconde a tela do jogo
         startChaseMinigame(); // Inicia o novo minigame
         return; // Para a progressão da história
@@ -265,6 +282,38 @@ function nextStory() {
     scaryMusic.currentTime = 0; // Corrigido de '-' para '='
   }
 
+  if (currentPath && currentPath[pathIndex] === "Com a lanterna ligada, você começa a procurar a fonte da voz..") {
+    // Escurece a tela antes do minigame
+    const overlay = document.createElement("div");
+    overlay.id = "fade-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "black";
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 3s ease";
+    overlay.style.zIndex = "10000";
+    document.body.appendChild(overlay);
+  
+    setTimeout(() => {
+      overlay.style.opacity = "1";
+    }, 0);
+  
+    setTimeout(() => {
+      document.body.removeChild(overlay);
+      gameScreen.classList.add("hidden");
+      lanternMinigame.classList.remove("hidden");
+      flashlightEnabled = false;
+      lightReveal.style.display = "none";
+    }, 3000);
+
+    lanternCanvas.addEventListener("mousemove", lanternaSotao);
+  
+    return;
+  }
+
   if (storyText.textContent === "A maçaneta da porta se move sozinha.") {
     heart.currentTime = 0;
     heart.play();
@@ -396,26 +445,31 @@ function iniciarMiniGame() {
   const limiteX = { min: 0, max: window.innerWidth - 50 };
   const limiteY = { min: 0, max: window.innerHeight - 50 };
 
+  const teclasPressionadas = {};
+
   function verificarColisao(a, b) {
     const aRect = a.getBoundingClientRect();
     const bRect = b.getBoundingClientRect();
-    return !(aRect.right < bRect.left || aRect.left > bRect.right || aRect.bottom < bRect.top || aRect.top > bRect.bottom);
+    return !(
+      aRect.right < bRect.left ||
+      aRect.left > bRect.right ||
+      aRect.bottom < bRect.top ||
+      aRect.top > bRect.bottom
+    );
   }
 
-  const handleKeydown = (e) => {
-    switch (e.key) {
-      case "ArrowLeft":
-        posX = Math.max(limiteX.min, posX - 10);
-        break;
-      case "ArrowRight":
-        posX = Math.min(limiteX.max, posX + 10);
-        break;
-      case "ArrowUp":
-        posY = Math.min(limiteY.max, posY + 10);
-        break;
-      case "ArrowDown":
-        posY = Math.max(limiteY.min, posY - 10);
-        break;
+  function moverPlayer() {
+    if (teclasPressionadas["ArrowLeft"]) {
+      posX = Math.max(limiteX.min, posX - 5);
+    }
+    if (teclasPressionadas["ArrowRight"]) {
+      posX = Math.min(limiteX.max, posX + 5);
+    }
+    if (teclasPressionadas["ArrowUp"]) {
+      posY = Math.min(limiteY.max, posY + 5);
+    }
+    if (teclasPressionadas["ArrowDown"]) {
+      posY = Math.max(limiteY.min, posY - 5);
     }
 
     player.style.left = posX + "px";
@@ -441,6 +495,8 @@ function iniciarMiniGame() {
         deathText.classList.remove("hidden");
       };
       document.removeEventListener("keydown", handleKeydown);
+      document.removeEventListener("keyup", handleKeyup);
+      clearInterval(gameLoop);
       return;
     }
 
@@ -459,13 +515,26 @@ function iniciarMiniGame() {
         storyText.textContent = currentPath[pathIndex];
         nextBtn.classList.remove("hidden");
         document.removeEventListener("keydown", handleKeydown);
+        document.removeEventListener("keyup", handleKeyup);
+        clearInterval(gameLoop);
       } else {
         alert("A porta está trancada. Encontre a chave!");
       }
     }
+  }
+
+  const handleKeydown = (e) => {
+    teclasPressionadas[e.key] = true;
+  };
+
+  const handleKeyup = (e) => {
+    teclasPressionadas[e.key] = false;
   };
 
   document.addEventListener("keydown", handleKeydown);
+  document.addEventListener("keyup", handleKeyup);
+
+  const gameLoop = setInterval(moverPlayer, 20); // Executa 50x por segundo
 }
 
 function startChaseMinigame() {
@@ -579,7 +648,7 @@ function startChaseMinigame() {
     // Verificar colisão com inimigo
     if (checkCollision(player, enemy)) {
       endMinigame();
-      showDeathScreen();
+      playDeathVideo();
       return;
     }
 
@@ -646,6 +715,15 @@ function startChaseMinigame() {
     document.removeEventListener("keyup", handleKeyup);
     run.pause();
     run.currentTime = 0;
+  
+    // Inicia a sequência do sótão
+    currentPath = sotao;
+    pathIndex = 0;
+    storyText.textContent = currentPath[pathIndex];
+  
+    // Garante que os botões relevantes estejam visíveis após o minigame
+    gameScreen.classList.remove("hidden");
+    nextBtn.classList.remove("hidden");
   }
 
   function showDeathScreen() {
@@ -653,15 +731,28 @@ function startChaseMinigame() {
     const deathText = document.getElementById("death-text");
     deathText.classList.remove("hidden");
   }
+
+  function playDeathVideo() {
+    const videoContainer = document.getElementById("videoChaseContainer");
+    const video = document.getElementById("videoChase");
+    videoContainer.classList.remove("hidden");
+    video.play();
+  
+    video.onended = () => {
+      videoContainer.classList.add("hidden");
+      showDeathScreen();
+    };
+  }
+  
 }
 
 const fnafScene = document.getElementById("fnaf4-scene");
-  const fnafCanvas = document.getElementById("fnaf4-canvas");
-  const flashlightBtn = document.getElementById("flashlight-btn");
-  const dangerBtn = document.getElementById("danger-btn");
+const fnafCanvas = document.getElementById("fnaf4-canvas");
+const flashlightBtn = document.getElementById("flashlight-btn");
+const dangerBtn = document.getElementById("danger-btn");
 
-  let flashlightOn = false;
-  let dangerTimeout;
+let flashlightOn = false;
+let dangerTimeout;
 
   function startFnafScene() {
     // Fade da música atual
@@ -1147,3 +1238,40 @@ function continueStoryFromSpecialButton() {
   `;
   document.body.appendChild(gameOverScreen);
 }
+
+const lanternMinigame = document.getElementById("lantern-minigame");
+const lanternCanvas = document.getElementById("lanternCanvas");
+const lightReveal = document.getElementById("lightReveal");
+const flashlightToggle = document.getElementById("flashlightToggle");
+const exitLanternGame = document.getElementById("exitLanternGame");
+
+let flashlightEnabled = false;
+
+function lanternaSotao(e) {
+  const rect = lanternCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Atualiza a máscara de luz
+  lightReveal.style.setProperty("--x", `${x}px`);
+  lightReveal.style.setProperty("--y", `${y}px`);
+}
+
+lanternCanvas.addEventListener("mousemove", lanternaSotao);
+
+flashlightToggle.addEventListener("click", () => {
+  flashlightEnabled = !flashlightEnabled;
+  lightReveal.style.display = flashlightEnabled ? "block" : "none";
+  lanternCanvas.style.cursor = flashlightEnabled ? "none" : "default";
+});
+
+lanternCanvas.addEventListener("mousemove", moveLantern);
+
+exitLanternGame.addEventListener("click", () => {
+  lanternMinigame.classList.add("hidden");
+  lightReveal.style.display = "none";
+  flashlightEnabled = false;
+  lanternCanvas.style.cursor = "default";
+  // Voltar para o jogo principal, exibir botões ou continuar a história
+  gameScreen.classList.remove("hidden");
+});
