@@ -744,7 +744,7 @@ section {
   position: absolute;
   width: 150px; /* Aumentei o tamanho da largura da porta */
   height: 250px; /* Aumentei o tamanho da altura da porta */
-  background-image: url('https://static.wikia.nocookie.net/fivenightsatfreddys/images/e/ea/Closet.png/revision/latest?cb=20180827134325'); /* Imagem da porta */
+  background-image: url('door.png'); /* Imagem da porta */
   background-size: cover;
   left: 1500px; /* posição da porta */
   bottom: 20px;
@@ -786,4 +786,21 @@ section {
   transform: translate(-50%, -50%);
   border: 2px solid #fff;
   background-color: #1a1a1a;
+}
+
+#hiddenObject {
+  position: absolute;
+  top: 80%;
+  left: 48%;
+  width: 200px; /* Tamanho da imagem */
+  height: auto;
+  transform: translate(-50%, -50%);
+  z-index: 10002;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+  
+}
+
+#hiddenObject.hidden {
+  display: none;
 }

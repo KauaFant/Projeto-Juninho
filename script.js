@@ -580,7 +580,7 @@ function startChaseMinigame() {
   const door = {
     x: canvas.width - 100,
     y: canvas.height / 2 - 40,
-    width: 40,
+    width: 70,
     height: 80,
     opened: false
   };
@@ -634,7 +634,7 @@ function startChaseMinigame() {
   keyImage.src = "https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif";
 
   const doorImage = new Image();
-  doorImage.src = "https://st.depositphotos.com/50990794/58333/v/450/depositphotos_583338808-stock-illustration-wooden-door-pixel-art-wood.jpg"
+  doorImage.src = "sótão.png"
 
   function gameLoop() {
     // Movimentação do jogador
@@ -1243,7 +1243,6 @@ const lanternMinigame = document.getElementById("lantern-minigame");
 const lanternCanvas = document.getElementById("lanternCanvas");
 const lightReveal = document.getElementById("lightReveal");
 const flashlightToggle = document.getElementById("flashlightToggle");
-const exitLanternGame = document.getElementById("exitLanternGame");
 
 let flashlightEnabled = false;
 
@@ -1252,7 +1251,6 @@ function lanternaSotao(e) {
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  // Atualiza a máscara de luz
   lightReveal.style.setProperty("--x", `${x}px`);
   lightReveal.style.setProperty("--y", `${y}px`);
 }
@@ -1263,15 +1261,32 @@ flashlightToggle.addEventListener("click", () => {
   flashlightEnabled = !flashlightEnabled;
   lightReveal.style.display = flashlightEnabled ? "block" : "none";
   lanternCanvas.style.cursor = flashlightEnabled ? "none" : "default";
+
+  // Exibe ou oculta o objeto misterioso com base na lanterna
+  hiddenObject.classList.toggle("hidden", !flashlightEnabled);
 });
 
 lanternCanvas.addEventListener("mousemove", moveLantern);
 
-exitLanternGame.addEventListener("click", () => {
-  lanternMinigame.classList.add("hidden");
-  lightReveal.style.display = "none";
-  flashlightEnabled = false;
-  lanternCanvas.style.cursor = "default";
-  // Voltar para o jogo principal, exibir botões ou continuar a história
-  gameScreen.classList.remove("hidden");
+const hiddenObject = document.getElementById("hiddenObject");
+let hoverTimeout;
+hiddenObject.addEventListener("mouseenter", () => {
+  hoverTimeout = setTimeout(() => {
+    lanternMinigame.classList.add("hidden");
+    lightReveal.style.display = "none";
+    hiddenObject.classList.add("hidden");
+    flashlightEnabled = false;
+    lanternCanvas.style.cursor = "default";
+
+    // Usa o caminho já definido
+    currentPath = sotao2;
+    pathIndex = 0;
+    storyText.textContent = currentPath[pathIndex];
+    gameScreen.classList.remove("hidden");
+    nextBtn.classList.remove("hidden");
+  }, 1500);
+});
+
+hiddenObject.addEventListener("mouseleave", () => {
+  clearTimeout(hoverTimeout);
 });
