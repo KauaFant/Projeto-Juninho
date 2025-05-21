@@ -22,7 +22,6 @@ const intro = document.getElementById("intro-music");
 const run = document.getElementById("run");
 
 
-
 let storyIndex = 0;
 let currentPath = null;
 let roomIndex = 0;
@@ -317,6 +316,20 @@ function nextStory() {
   if (storyText.textContent === "A maçaneta da porta se move sozinha.") {
     heart.currentTime = 0;
     heart.play();
+  }
+
+  if (storyText.textContent === "Você se vê diante a um impasse") {
+    nextBtn.classList.add("hidden"); // Esconde o botão "Avançar"
+    
+    const impasseButtons = document.getElementById("impasse-buttons");
+    impasseButtons.classList.remove("hidden");
+  
+    // Garante que o efeito ocorra após o display mudar
+    setTimeout(() => {
+      impasseButtons.classList.add("visible");
+    }, 10);
+  
+    return; // Para impedir que continue avançando a história
   }
 
   if (storyText.textContent === "Você sente mais medo..") {
@@ -1290,3 +1303,60 @@ hiddenObject.addEventListener("mouseenter", () => {
 hiddenObject.addEventListener("mouseleave", () => {
   clearTimeout(hoverTimeout);
 });
+
+document.getElementById("helpBtn").onclick = () => {
+  currentPath = [
+    "Você decide ajudá-lo.",
+    "Ele parece grato, mas seus olhos brilham de forma estranha...",
+    "Será que foi a decisão certa?"
+  ];
+  pathIndex = 0;
+  storyText.textContent = currentPath[pathIndex];
+
+  document.getElementById("impasse-buttons").classList.add("hidden");
+  nextBtn.classList.remove("hidden");
+};
+
+document.getElementById("helpBtn").onclick = () => {
+  const gameOverMusic = document.getElementById("game-over-music");
+  gameOverMusic.currentTime = 0;  // Reinicia a música do começo
+  gameOverMusic.play();
+  document.getElementById("impasse-buttons").classList.add("hidden");
+  nextBtn.classList.add("hidden");
+
+  const screen = document.getElementById("dark-screen");
+  const glowText = document.getElementById("glow-text");
+  const bgImage = document.getElementById("dark-background");
+
+  screen.classList.remove("hidden");
+
+  // Inicia transição da tela escura
+  setTimeout(() => {
+    screen.style.opacity = 1;
+    typeWriterGlow("Você percebe que não fez uma escolha boa☠️", glowText, 120);
+  }, 100);
+
+  // Após 4 segundos, mostra a imagem com fade
+  setTimeout(() => {
+    bgImage.classList.remove("hidden");
+    bgImage.classList.add("visible");
+  }, 4000);
+};
+
+function typeWriterGlow(text, element, speed = 150, callback = null) {
+  let i = 0;
+  element.textContent = "";
+  element.style.opacity = 1;
+
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    } else if (callback) {
+      callback();
+    }
+  }
+
+  type();
+}
