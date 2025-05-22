@@ -21,10 +21,10 @@ const fear = document.getElementById("theme");
 const intro = document.getElementById("intro-music");
 const run = document.getElementById("run");
 
-
 let storyIndex = 0;
 let currentPath = null;
 let roomIndex = 0;
+
 const storyLines = [
   "Você está na sua Mansão. Está no seu quarto. Sozinho, seus pais estão viajando.",
   "O dia tá chuvoso, frio, e a noite está muito mais escura que o normal.",
@@ -278,7 +278,7 @@ function nextStory() {
     newMusic.pause();
     newMusic.currentTime = 0
     scaryMusic.pause();
-    scaryMusic.currentTime = 0; // Corrigido de '-' para '='
+    scaryMusic.currentTime = 0;
   }
 
   if (currentPath && currentPath[pathIndex] === "Com a lanterna ligada, você começa a procurar a fonte da voz..") {
@@ -345,6 +345,7 @@ function nextStory() {
     startFnafScene();
     return;
   }
+
   if (storyText.textContent === "Você começa a escutar outro som.") {
     newMusic.currentTime = 0;
     newMusic.play();
@@ -748,6 +749,7 @@ function startChaseMinigame() {
   function playDeathVideo() {
     const videoContainer = document.getElementById("videoChaseContainer");
     const video = document.getElementById("videoChase");
+    nextBtn.classList.add("hidden");
     videoContainer.classList.remove("hidden");
     video.play();
   
@@ -1305,42 +1307,57 @@ hiddenObject.addEventListener("mouseleave", () => {
 });
 
 document.getElementById("helpBtn").onclick = () => {
-  currentPath = [
-    "Você decide ajudá-lo.",
-    "Ele parece grato, mas seus olhos brilham de forma estranha...",
-    "Será que foi a decisão certa?"
-  ];
-  pathIndex = 0;
-  storyText.textContent = currentPath[pathIndex];
-
-  document.getElementById("impasse-buttons").classList.add("hidden");
-  nextBtn.classList.remove("hidden");
-};
-
-document.getElementById("helpBtn").onclick = () => {
   const gameOverMusic = document.getElementById("game-over-music");
-  gameOverMusic.currentTime = 0;  // Reinicia a música do começo
+  gameOverMusic.currentTime = 0;
   gameOverMusic.play();
+
   document.getElementById("impasse-buttons").classList.add("hidden");
   nextBtn.classList.add("hidden");
 
   const screen = document.getElementById("dark-screen");
   const glowText = document.getElementById("glow-text");
   const bgImage = document.getElementById("dark-background");
+  const deathVideo = document.getElementById("death-video");
+  const deathScreen = document.getElementById("death-screen");
 
   screen.classList.remove("hidden");
 
-  // Inicia transição da tela escura
+  // Animações iniciais da tela escura
   setTimeout(() => {
     screen.style.opacity = 1;
+    glowText.style.opacity = 1;
+    backBtn.classList.add("hidden");
     typeWriterGlow("Você percebe que não fez uma escolha boa☠️", glowText, 120);
   }, 100);
 
-  // Após 4 segundos, mostra a imagem com fade
   setTimeout(() => {
     bgImage.classList.remove("hidden");
+    void bgImage.offsetHeight;
     bgImage.classList.add("visible");
   }, 4000);
+
+  // ⏱️ Após 27 segundos, mostra o vídeo
+  setTimeout(() => {
+    screen.classList.add("hidden");
+    bgImage.classList.add("hidden");
+    nextBtn.classList.add("hidden");
+    backBtn.classList.add("hidden");
+    deathVideo.classList.remove("hidden");
+    deathVideo.play();
+    gameOverMusic.pause();
+    gameOverMusic.currentTime = 0
+  }, 27000);
+
+  // Quando o vídeo terminar, mostra a tela de morte
+  deathVideo.onended = () => {
+    deathVideo.classList.add("hidden");
+    deathScreen.classList.remove("hidden");
+  };
+};
+
+// Botão de reinício
+document.getElementById("retry-btn").onclick = () => {
+  location.reload(); // ou sua lógica para voltar ao início do jogo
 };
 
 function typeWriterGlow(text, element, speed = 150, callback = null) {

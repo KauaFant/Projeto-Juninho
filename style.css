@@ -618,28 +618,6 @@ section {
   z-index: 1;
 }
 
-/* Estilo dos botões */
-#btn-armario, #btn-esquerda, #btn-direita {
-  position: fixed;
-  bottom: 20px;
-  padding: 10px 20px;
-  font-size: 18px;
-  z-index: 2;
-}
-
-#btn-armario {
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#btn-esquerda {
-  left: 10%;
-}
-
-#btn-direita {
-  right: 10%;
-}
-
 #flashlight {
   position: fixed;
   top: 0;
@@ -697,6 +675,12 @@ section {
   border-radius: 5px;
 }
 
+#flashlightToggle.active {
+  background-color: yellow;
+  color: black;
+  box-shadow: 0 0 20px yellow;
+}
+
 #flashlightToggle { left: 10px; }
 #exitLanternGame { right: 10px; }
 
@@ -746,7 +730,7 @@ section {
   height: 250px; /* Aumentei o tamanho da altura da porta */
   background-image: url('door.png'); /* Imagem da porta */
   background-size: cover;
-  left: 1500px; /* posição da porta */
+  left: 80%; /* posição da porta */
   bottom: 20px;
   z-index: 5;
 }
@@ -807,7 +791,7 @@ section {
 
 #impasse-buttons {
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 7s ease;
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -836,7 +820,7 @@ section {
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 4s ease;
 }
 
 #glow-text {
@@ -847,6 +831,9 @@ section {
   text-shadow: 0 0 10px white, 0 0 20px #ccc;
   font-family: 'Courier New', Courier, monospace;
   opacity: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* fundo escuro e transparente */
+  padding: 20px;
+  border-radius: 10px;
 }
 
 #dark-background {
@@ -857,7 +844,7 @@ section {
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 8s ease; /* <--- alterado para 4 segundos */
   z-index: -1;
 }
 
