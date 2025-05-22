@@ -684,6 +684,25 @@ section {
 #flashlightToggle { left: 10px; }
 #exitLanternGame { right: 10px; }
 
+@keyframes flashlightFlash {
+  0% { background-color: #111; color: white; box-shadow: none; }
+  25% { background-color: yellow; color: black; box-shadow: 0 0 10px yellow; }
+  50% { background-color: #111; color: white; box-shadow: none; }
+  75% { background-color: yellow; color: black; box-shadow: 0 0 20px yellow; }
+  100% { background-color: yellow; color: black; box-shadow: 0 0 20px yellow; }
+}
+
+@keyframes flashlightPulse {
+  0%, 100% { box-shadow: 0 0 10px yellow; }
+  50% { box-shadow: 0 0 30px yellow; }
+}
+
+#flashlightToggle.active {
+  background-color: yellow;
+  color: black;
+  animation: flashlightFlash 0.6s ease-out, flashlightPulse 1.5s infinite ease-in-out;
+}
+
 #minigame-room {
   position: relative;
   width: 100vw;

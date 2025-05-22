@@ -20,6 +20,8 @@ const mysterious = document.getElementById("mysterious");
 const fear = document.getElementById("theme");
 const intro = document.getElementById("intro-music");
 const run = document.getElementById("run");
+const escolha = document.getElementById("escolhas");
+console.log(escolha);
 
 let storyIndex = 0;
 let currentPath = null;
@@ -178,9 +180,8 @@ function nextStory() {
         yesButton.onclick = () => {
           currentPath = [ // Novo caminho para o "Sim"
             "Você decide ajudar a voz desconhecida.",
-            "Você toca na parede, ela começa a tremer...",
-            "Uma luz intensa surge, e você ouve uma risada distante.",
-            "Algo mudou... para sempre."
+            "Parece que na parede tem um enigma",
+            "Você fica confuso e decide ajudar"
           ];
           pathIndex = 0;
           storyText.textContent = currentPath[pathIndex];
@@ -231,6 +232,12 @@ function nextStory() {
       if (storyText.textContent === "Mas eles não param. Pelo contrário, parecem mais próximos.") {
         newMusic.currentTime = 0;
         newMusic.play();
+      }
+
+      if (storyText.textContent === "O ambiente esta escuro, você começa escutar barulhos estranhos") {
+        escolha.currentTime = 0;
+        escolha.play();
+        console.log("AAAAA")
       }
 
     } else {
@@ -734,7 +741,7 @@ function startChaseMinigame() {
     currentPath = sotao;
     pathIndex = 0;
     storyText.textContent = currentPath[pathIndex];
-  
+    console.log(currentPath[0])
     // Garante que os botões relevantes estejam visíveis após o minigame
     gameScreen.classList.remove("hidden");
     nextBtn.classList.remove("hidden");
@@ -1277,10 +1284,12 @@ flashlightToggle.addEventListener("click", () => {
   lightReveal.style.display = flashlightEnabled ? "block" : "none";
   lanternCanvas.style.cursor = flashlightEnabled ? "none" : "default";
 
+  // Alterna a classe active no botão para ativar a animação
+  flashlightToggle.classList.toggle("active", flashlightEnabled);
+
   // Exibe ou oculta o objeto misterioso com base na lanterna
   hiddenObject.classList.toggle("hidden", !flashlightEnabled);
 });
-
 lanternCanvas.addEventListener("mousemove", moveLantern);
 
 const hiddenObject = document.getElementById("hiddenObject");
@@ -1336,7 +1345,7 @@ document.getElementById("helpBtn").onclick = () => {
     bgImage.classList.add("visible");
   }, 4000);
 
-  // ⏱️ Após 27 segundos, mostra o vídeo
+  // ⏱️ Após 15 segundos, mostra o vídeo
   setTimeout(() => {
     screen.classList.add("hidden");
     bgImage.classList.add("hidden");
@@ -1346,7 +1355,7 @@ document.getElementById("helpBtn").onclick = () => {
     deathVideo.play();
     gameOverMusic.pause();
     gameOverMusic.currentTime = 0
-  }, 27000);
+  }, 15000);
 
   // Quando o vídeo terminar, mostra a tela de morte
   deathVideo.onended = () => {
