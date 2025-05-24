@@ -870,3 +870,12 @@ section {
 #dark-background.visible {
   opacity: 1;
 }
+
+#player-minigame, #enemy-room {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  z-index: 999;
+  overflow: hidden;
+}

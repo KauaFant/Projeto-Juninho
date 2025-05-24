@@ -100,6 +100,13 @@ const sotao2 = [
   "Você se vê diante a um impasse"
 ]
 
+const evil = [
+  "Você ataca ele, ele chora e implora por ajuda",
+  "Você continua batendo nele. Você destrói ele.",
+  "Voce percebe que pode destrui-los...",
+  "Então você vai atrás dos outros..."
+]
+
 // Eventos
 startBtn.addEventListener("click", startGame);
 nextBtn.addEventListener("click", nextStory);
@@ -234,11 +241,11 @@ function nextStory() {
         newMusic.play();
       }
 
-      if (storyText.textContent === "O ambiente esta escuro, você começa escutar barulhos estranhos") {
+      if (storyText.textContent === "Você cai para trás, assustado, e avista um taco de beisebol") {
+        escolha.pause();
         escolha.currentTime = 0;
-        escolha.play();
-        console.log("AAAAA")
       }
+
 
     } else {
       currentPath = null;
@@ -286,6 +293,32 @@ function nextStory() {
     newMusic.currentTime = 0
     scaryMusic.pause();
     scaryMusic.currentTime = 0;
+  }
+
+  if (storyText.textContent === "Então você vai atrás dos outros...") {
+    const overlay = document.createElement("div");
+    overlay.id = "fade-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.backgroundColor = "black";
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 2s ease";
+    overlay.style.zIndex = "10000";
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      overlay.style.opacity = "1";
+    }, 0);
+
+    setTimeout(() => {
+      document.body.removeChild(overlay);
+      iniciarMiniGameInimigos();
+    }, 2000);
+
+    return;
   }
 
   if (currentPath && currentPath[pathIndex] === "Com a lanterna ligada, você começa a procurar a fonte da voz..") {
@@ -745,6 +778,8 @@ function startChaseMinigame() {
     // Garante que os botões relevantes estejam visíveis após o minigame
     gameScreen.classList.remove("hidden");
     nextBtn.classList.remove("hidden");
+    escolha.currentTime = 0;
+    escolha.play();
   }
 
   function showDeathScreen() {
@@ -1193,7 +1228,6 @@ backToStartBtn.addEventListener("click", () => {
   document.getElementById("coward-ending").classList.add("hidden");
   restartGame();
 });
-
 // Função que inicia a contagem regressiva
 function startCountdown() {
   const timeLimit = 10; // 10 segundos de contagem
@@ -1385,4 +1419,96 @@ function typeWriterGlow(text, element, speed = 150, callback = null) {
   }
 
   type();
+}
+
+document.getElementById("killBtn").onclick = () => {
+  document.getElementById("impasse-buttons").classList.add("hidden");
+  nextBtn.classList.remove("hidden");
+  backBtn.classList.remove("hidden");
+  currentPath = evil;
+  pathIndex = 0;
+  storyText.textContent = currentPath[pathIndex];
+};
+
+function iniciarMiniGameInimigos() {
+  const minigameDiv = document.getElementById("minigame-inimigos");
+  minigameDiv.classList.remove("hidden");
+
+  const jogador = document.getElementById("jogador");
+  const porta = document.getElementById("porta");
+
+  let jogadorX = 100, jogadorY = 100, velocidade = 5;
+  let sala = 1;
+
+  const inimigos = [
+    { el: document.getElementById("inimigo1"), x: 300, y: 100, vivo: true },
+    { el: document.getElementById("inimigo2"), x: 400, y: 200, vivo: true },
+    { el: document.getElementById("inimigo3"), x: 500, y: 300, vivo: true },
+    { el: document.getElementById("inimigo4"), x: 600, y: 400, vivo: true },
+    { el: document.getElementById("inimigo5"), x: 700, y: 150, vivo: true },
+  ];
+
+  document.addEventListener("keydown", moverJogador);
+
+  function moverJogador(e) {
+    switch (e.key) {
+      case "ArrowUp":
+      case "w": jogadorY -= velocidade; break;
+      case "ArrowDown":
+      case "s": jogadorY += velocidade; break;
+      case "ArrowLeft":
+      case "a": jogadorX -= velocidade; break;
+      case "ArrowRight":
+      case "d": jogadorX += velocidade; break;
+      case " ": atacar(); break;
+    }
+
+    jogador.style.left = jogadorX + "px";
+    jogador.style.top = jogadorY + "px";
+
+    if (sala === 1 && colisao(jogador, porta)) {
+      sala = 2;
+      document.getElementById("sala1").classList.add("hidden");
+      document.getElementById("sala2").classList.remove("hidden");
+    }
+  }
+
+  function atacar() {
+    inimigos.forEach(inimigo => {
+      if (inimigo.vivo && colisao(jogador, inimigo.el)) {
+        inimigo.el.style.display = "none";
+        inimigo.vivo = false;
+      }
+    });
+  }
+
+  function colisao(a, b) {
+    const r1 = a.getBoundingClientRect();
+    const r2 = b.getBoundingClientRect();
+    return !(
+      r1.right < r2.left ||
+      r1.left > r2.right ||
+      r1.bottom < r2.top ||
+      r1.top > r2.bottom
+    );
+  }
+
+  function moverInimigos() {
+    if (sala !== 2) return;
+    inimigos.forEach(inimigo => {
+      if (!inimigo.vivo) return;
+      const dx = jogadorX - inimigo.x;
+      const dy = jogadorY - inimigo.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 0) {
+        inimigo.x += (dx / dist) * 1.5;
+        inimigo.y += (dy / dist) * 1.5;
+        inimigo.el.style.left = inimigo.x + "px";
+        inimigo.el.style.top = inimigo.y + "px";
+      }
+    });
+    requestAnimationFrame(moverInimigos);
+  }
+
+  moverInimigos();
 }
