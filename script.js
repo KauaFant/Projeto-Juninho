@@ -21,7 +21,7 @@ const fear = document.getElementById("theme");
 const intro = document.getElementById("intro-music");
 const run = document.getElementById("run");
 const escolha = document.getElementById("escolhas");
-console.log(escolha);
+const alone = document.getElementById("Evil");
 
 let storyIndex = 0;
 let currentPath = null;
@@ -244,6 +244,8 @@ function nextStory() {
       if (storyText.textContent === "Você cai para trás, assustado, e avista um taco de beisebol") {
         escolha.pause();
         escolha.currentTime = 0;
+        alone.currentTime = 0;
+        alone.play();
       }
 
 
@@ -288,7 +290,6 @@ function nextStory() {
   }
   if (storyText.textContent === "Os sons param, você só escuta seu coração.") {
     bgMusic.pause();
-    bgMusic.currentTime = 0; // Reseta a música
     newMusic.pause();
     newMusic.currentTime = 0
     scaryMusic.pause();
@@ -571,6 +572,7 @@ function iniciarMiniGame() {
         document.removeEventListener("keydown", handleKeydown);
         document.removeEventListener("keyup", handleKeyup);
         clearInterval(gameLoop);
+        bgMusic.play();
       } else {
         alert("A porta está trancada. Encontre a chave!");
       }
@@ -619,7 +621,7 @@ function startChaseMinigame() {
     y: 50,
     width: 60,
     height: 60,
-    speed: 2,
+    speed: 1,
     color: "#ff0000"
   };
 
@@ -1431,84 +1433,363 @@ document.getElementById("killBtn").onclick = () => {
 };
 
 function iniciarMiniGameInimigos() {
-  const minigameDiv = document.getElementById("minigame-inimigos");
-  minigameDiv.classList.remove("hidden");
+  const canvas = document.getElementById("chase-minigame");
+  const ctx = canvas.getContext("2d");
+  canvas.classList.remove("hidden");
 
-  const jogador = document.getElementById("jogador");
-  const porta = document.getElementById("porta");
+  // Pausar músicas existentes
+  [bgMusic, creepySound, scaryMusic, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
 
-  let jogadorX = 100, jogadorY = 100, velocidade = 5;
-  let sala = 1;
+  const player = {
+    x: canvas.width - 160, // perto da porta
+    y: canvas.height / 2 - 30,
+    width: 60,
+    height: 60,
+    speed: 3,
+    color: "#00ff00"
+  };
 
-  const inimigos = [
-    { el: document.getElementById("inimigo1"), x: 300, y: 100, vivo: true },
-    { el: document.getElementById("inimigo2"), x: 400, y: 200, vivo: true },
-    { el: document.getElementById("inimigo3"), x: 500, y: 300, vivo: true },
-    { el: document.getElementById("inimigo4"), x: 600, y: 400, vivo: true },
-    { el: document.getElementById("inimigo5"), x: 700, y: 150, vivo: true },
-  ];
+  const enemy = {
+    x: 50,
+    y: 50,
+    width: 60,
+    height: 60,
+    speed: 4.5,
+    color: "#ff0000"
+  };
 
-  document.addEventListener("keydown", moverJogador);
+  const door = {
+    x: canvas.width - 100,
+    y: canvas.height / 2 - 40,
+    width: 70,
+    height: 80,
+    opened: false
+  };
 
-  function moverJogador(e) {
-    switch (e.key) {
-      case "ArrowUp":
-      case "w": jogadorY -= velocidade; break;
-      case "ArrowDown":
-      case "s": jogadorY += velocidade; break;
-      case "ArrowLeft":
-      case "a": jogadorX -= velocidade; break;
-      case "ArrowRight":
-      case "d": jogadorX += velocidade; break;
-      case " ": atacar(); break;
-    }
+  const teclasAtivas = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false
+  };
 
-    jogador.style.left = jogadorX + "px";
-    jogador.style.top = jogadorY + "px";
-
-    if (sala === 1 && colisao(jogador, porta)) {
-      sala = 2;
-      document.getElementById("sala1").classList.add("hidden");
-      document.getElementById("sala2").classList.remove("hidden");
-    }
+  function handleKeydown(e) {
+    if (e.key in teclasAtivas) teclasAtivas[e.key] = true;
+  }
+  
+  function handleKeyup(e) {
+    if (e.key in teclasAtivas) teclasAtivas[e.key] = false;
   }
 
-  function atacar() {
-    inimigos.forEach(inimigo => {
-      if (inimigo.vivo && colisao(jogador, inimigo.el)) {
-        inimigo.el.style.display = "none";
-        inimigo.vivo = false;
-      }
-    });
-  }
+  document.addEventListener("keydown", handleKeydown);
+  document.addEventListener("keyup", handleKeyup);
 
-  function colisao(a, b) {
-    const r1 = a.getBoundingClientRect();
-    const r2 = b.getBoundingClientRect();
-    return !(
-      r1.right < r2.left ||
-      r1.left > r2.right ||
-      r1.bottom < r2.top ||
-      r1.top > r2.bottom
+  function checkCollision(a, b) {
+    return (
+      a.x < b.x + b.width &&
+      a.x + a.width > b.x &&
+      a.y < b.y + b.height &&
+      a.y + a.height > b.y
     );
   }
 
-  function moverInimigos() {
-    if (sala !== 2) return;
-    inimigos.forEach(inimigo => {
-      if (!inimigo.vivo) return;
-      const dx = jogadorX - inimigo.x;
-      const dy = jogadorY - inimigo.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 0) {
-        inimigo.x += (dx / dist) * 1.5;
-        inimigo.y += (dy / dist) * 1.5;
-        inimigo.el.style.left = inimigo.x + "px";
-        inimigo.el.style.top = inimigo.y + "px";
-      }
-    });
-    requestAnimationFrame(moverInimigos);
+  function updateEnemy() {
+    const dx = player.x - enemy.x;
+    const dy = player.y - enemy.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance > 0) {
+      enemy.x += (dx / distance) * enemy.speed;
+      enemy.y += (dy / distance) * enemy.speed;
+    }
   }
 
-  moverInimigos();
+  const playerImage = new Image();
+  playerImage.src = "https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927";
+
+  const enemyImage = new Image();
+  enemyImage.src = "https://static.wikia.nocookie.net/fnafapedia/images/e/e7/Spring_Freddy_Chomping.gif/revision/latest/scale-to-width-down/250?cb=20240106173010";
+
+  const doorImage = new Image();
+  doorImage.src = "sótão.png"
+
+  function gameLoop() {
+    // Movimentação do jogador
+    if (teclasAtivas.ArrowUp && player.y > 0) player.y -= player.speed;
+    if (teclasAtivas.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
+    if (teclasAtivas.ArrowLeft && player.x > 0) player.x -= player.speed;
+    if (teclasAtivas.ArrowRight && player.x < canvas.width - player.width) player.x += player.speed;
+
+    updateEnemy();
+
+    // Verificar colisão com inimigo
+    if (checkCollision(player, enemy)) {
+      iniciarMiniGameBatalha();
+      return;
+    }
+
+    // Limpar tela
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Desenhar jogador
+    if (playerImage.complete) {
+      ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+    } else {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    // Desenhar inimigo
+    if (enemyImage.complete) {
+      ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
+    } else {
+      ctx.fillStyle = enemy.color;
+      ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+    }
+
+    // Desenhar porta
+    if (doorImage.complete) {
+      ctx.drawImage(doorImage, door.x, door.y, door.width, door.height);
+    } else {
+      ctx.fillStyle = "brown";
+      ctx.fillRect(door.x, door.y, door.width, door.height);
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
+
+}
+
+function iniciarMiniGameBatalha() {
+  alone.pause();
+  alone.currentTime = 0;
+  const canvas = document.getElementById("chase-minigame");
+  const ctx = canvas.getContext("2d");
+  const box = { x: canvas.width / 2 - 150, y: canvas.height / 2 - 100, width: 300, height: 200 };
+  const heart = { x: box.x + box.width / 2 - 20, y: box.y + box.height / 2 - 20, size: 40, speed: 5 };
+  const teclasBatalha = { up: false, down: false, left: false, right: false };
+  const balas = [];
+
+  let playerAlive = true;
+  let balaSpeed = 3 + Math.random() * 2; // velocidade inicial balas topo
+  let showMessage = false;
+  let message = "";
+  let messageIndex = 0;
+
+  const messageText = "Você vai morrer";
+  
+  let lateralBalasAtivas = false; // Flag para balas das laterais
+
+  // Carregar a imagem do coração
+  const heartImage = new Image();
+  heartImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Undertale_red_soul.svg/2048px-Undertale_red_soul.svg.png';
+
+  // Carregar a imagem que ficará no topo do quadrado
+  const topImage = new Image();
+  topImage.src = 'fredão_chefe.gif'; // Exemplo de imagem
+
+  let heartImageLoaded = false;
+  let topImageLoaded = false;
+
+  function tryStart() {
+    if (heartImageLoaded && topImageLoaded) {
+      loopBatalha();
+    }
+  }
+
+  heartImage.onload = () => {
+    heartImageLoaded = true;
+    tryStart();
+  };
+
+  topImage.onload = () => {
+    topImageLoaded = true;
+    tryStart();
+  };
+
+  function handle(e, isDown) {
+    const tecla = e.key.toLowerCase();
+    switch (tecla) {
+      case 'arrowup':
+        teclasBatalha.up = isDown;
+        break;
+      case 'arrowdown':
+        teclasBatalha.down = isDown;
+        break;
+      case 'arrowleft':
+        teclasBatalha.left = isDown;
+        break;
+      case 'arrowright':
+        teclasBatalha.right = isDown;
+        break;
+    }
+    e.preventDefault();
+  }
+
+  document.addEventListener("keydown", e => handle(e, true));
+  document.addEventListener("keyup", e => handle(e, false));
+
+  function criarBala() {
+    if (!lateralBalasAtivas) {
+      // Só balas do topo inicialmente
+      balas.push({
+        x: Math.random() * (canvas.width - 10),
+        y: 0,
+        width: 30,
+        height: 30,
+        speed: balaSpeed,
+        direction: 'down' // Direção para saber como mover
+      });
+    } else {
+      // Após 10 segundos: pode criar balas do topo OU das laterais
+      const spawnSide = Math.random();
+      if (spawnSide < 0.5) {
+        // Bala do topo
+        balas.push({
+          x: Math.random() * (canvas.width - 10),
+          y: 0,
+          width: 30,
+          height: 30,
+          speed: balaSpeed,
+          direction: 'down'
+        });
+      } else if (spawnSide < 0.75) {
+        // Bala da esquerda, movendo para a direita
+        balas.push({
+          x: 0,
+          y: Math.random() * (canvas.height - 10),
+          width: 30,
+          height: 30,
+          speed: balaSpeed,
+          direction: 'right'
+        });
+      } else {
+        // Bala da direita, movendo para a esquerda
+        balas.push({
+          x: canvas.width - 30,
+          y: Math.random() * (canvas.height - 10),
+          width: 30,
+          height: 30,
+          speed: balaSpeed,
+          direction: 'left'
+        });
+      }
+    }
+  }
+
+  function moverBalas() {
+    for (let i = balas.length - 1; i >= 0; i--) {
+      const bala = balas[i];
+      if (bala.direction === 'down') {
+        bala.y += bala.speed;
+        if (bala.y > canvas.height) {
+          balas.splice(i, 1);
+        }
+      } else if (bala.direction === 'right') {
+        bala.x += bala.speed;
+        if (bala.x > canvas.width) {
+          balas.splice(i, 1);
+        }
+      } else if (bala.direction === 'left') {
+        bala.x -= bala.speed;
+        if (bala.x + bala.width < 0) {
+          balas.splice(i, 1);
+        }
+      }
+    }
+  }
+
+  function desenharBalas() {
+    ctx.fillStyle = "yellow";
+    for (const bala of balas) {
+      ctx.fillRect(bala.x, bala.y, bala.width, bala.height);
+    }
+  }
+
+  function checarColisaoBala() {
+    for (const bala of balas) {
+      if (
+        heart.x < bala.x + bala.width &&
+        heart.x + heart.size > bala.x &&
+        heart.y < bala.y + bala.height &&
+        heart.y + heart.size > bala.y
+      ) {
+        playerAlive = false; // O jogador foi atingido
+      }
+    }
+  }
+
+  function desenharBox() {
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(box.x, box.y, box.width, box.height);
+  }
+
+  function desenharHeart() {
+    ctx.drawImage(heartImage, heart.x, heart.y, heart.size, heart.size); // Desenha a imagem do coração
+  }
+
+  function desenharTopImage() {
+    ctx.drawImage(topImage, box.x + (box.width / 2) - 75, box.y - 150, 170, 150);
+  }
+
+  function moverHeart() {
+    if (teclasBatalha.up && heart.y > box.y) heart.y -= heart.speed;
+    if (teclasBatalha.down && heart.y < box.y + box.height - heart.size) heart.y += heart.speed;
+    if (teclasBatalha.left && heart.x > box.x) heart.x -= heart.speed;
+    if (teclasBatalha.right && heart.x < box.x + box.width - heart.size) heart.x += heart.speed;
+  }
+
+  // Começa a gerar balas a cada 1 segundo
+  setInterval(criarBala, 1000);
+
+  // Função para exibir a mensagem com efeito de digitação
+  function typeMessage() {
+    if (messageIndex < messageText.length) {
+      message += messageText.charAt(messageIndex);
+      messageIndex++;
+      setTimeout(typeMessage, 300); // Tempo entre cada letra
+    } else {
+      balaSpeed += 5; // Aumenta a velocidade das balas após a mensagem
+      setInterval(criarBala,500);
+    }
+  }
+
+  // Inicia a digitação da mensagem após 16 segundos
+  setTimeout(() => {
+    showMessage = true;
+    typeMessage();
+  }, 16000); // 10 segundos
+
+  function loopBatalha() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    desenharBox();
+    desenharTopImage(); // Desenha a imagem no topo
+    moverHeart();
+    desenharHeart();
+    moverBalas();
+    desenharBalas();
+    checarColisaoBala();
+
+    // Desenhar a mensagem se showMessage for true
+    if (showMessage) {
+      ctx.fillStyle = "white";
+      ctx.font = "30px Arial";
+      ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width / 2, canvas.height / 2);
+    }
+
+    if (!playerAlive) {
+      ctx.fillStyle = "white";
+      ctx.font = "30px Arial";
+      ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
+      return; // Para o loop se o jogador não estiver mais vivo
+    }
+
+    requestAnimationFrame(loopBatalha);
+  }
 }
