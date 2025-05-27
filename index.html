@@ -46,11 +46,6 @@
         <button id="door2Btn" class="door-btn right"></button>
       </div>
     </div>
-    <div id="camera-container" class="hidden">
-    </div>
-    <button id="btn-armario" class="hidden"></button>
-    <button id="btn-esquerda" class="hidden"></button>
-    <button id="btn-direita" class="hidden"></button>
   </div>
   <div id="fnafLightReveal"></div>
   <div id="death-screen" class="hidden">
@@ -113,6 +108,7 @@
   </div>
   <div id="countdown-display" style="position: absolute; top: 10px; left: 10px; color: white; font-size: 1.5rem;"></div>
   <div id="gameover-video-container" class="hidden">
+  <div id="fredao" class="fredao" style="display: none;"></div>
     <video id="gameover-video" width="100%" height="100%">
       <source src="[FNAF SFM] Five Night's at Freddy's 4 All Jumpscare's Animation - YouTube e mais 3 páginas - Perfil 1 — Microsoft​ Edge 27_04_2025 18_43_48_Trim_Trim.mp4" type="video/mp4">
     </video>
@@ -142,6 +138,24 @@
       <div id="coward-light-effect"></div>
     </div>
   </div>
+  <div id="tela-morte" style="display: none;">
+    <h1 id="texto-morte" style="color: white; font-size: 60px; font-family: sans-serif;">Game Over</h1>
+  </div>
+  <!-- Tela preta com botão -->
+<div id="tela-final" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; justify-content:center; align-items:center; z-index:9999; flex-direction:column;">
+  <button id="botao-matar" style="font-size: 30px; padding: 15px 40px; cursor:pointer;">Matar?</button>
+</div>
+<div id="fade-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:10002; pointer-events:none; opacity:0; transition:opacity 10s;"></div>
+
+<!-- Vídeo em tela cheia -->
+<video id="video-final" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:10000;" autoplay>
+  <source src="final_end ‐ Feito com o Clipchamp.mp4" type="video/mp4">
+</video>
+
+<!-- Tela final do Ego -->
+<div id="tela-ego" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:white; font-size:60px; font-family:sans-serif; justify-content:center; align-items:center; z-index:10001;">
+  Final Ego
+</div>
   <canvas id="chase-minigame" width="600" height="600" class="hidden"></canvas>
   <audio id="bg-music" loop>
     <source src="Hollow Knight OST - Dream.mp3" type="audio/mp3">
@@ -193,6 +207,14 @@
 
   <audio id="Evil" loop>
     <source src="Little Nightmares - PS4⧸XB1⧸PC - OST Soundtrack 8 'Six's Theme Part I'.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="Evil2" loop>
+    <source src="22 Six's Theme Part II.mp3" type="audio/mp3">
+  </audio>
+
+  <audio id="end" loop>
+    <source src="fredão.mp3" type="audio/mp3">
   </audio>
 
   <script src="script.js"></script>

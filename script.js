@@ -22,6 +22,8 @@ const intro = document.getElementById("intro-music");
 const run = document.getElementById("run");
 const escolha = document.getElementById("escolhas");
 const alone = document.getElementById("Evil");
+const aloneEnd = document.getElementById("end");
+const aloneEnd2 = document.getElementById("Evil2");
 
 let storyIndex = 0;
 let currentPath = null;
@@ -621,7 +623,7 @@ function startChaseMinigame() {
     y: 50,
     width: 60,
     height: 60,
-    speed: 1,
+    speed: 2.6,
     color: "#ff0000"
   };
 
@@ -776,7 +778,6 @@ function startChaseMinigame() {
     currentPath = sotao;
     pathIndex = 0;
     storyText.textContent = currentPath[pathIndex];
-    console.log(currentPath[0])
     // Garante que os botões relevantes estejam visíveis após o minigame
     gameScreen.classList.remove("hidden");
     nextBtn.classList.remove("hidden");
@@ -1567,6 +1568,8 @@ function iniciarMiniGameInimigos() {
 function iniciarMiniGameBatalha() {
   alone.pause();
   alone.currentTime = 0;
+  aloneEnd.play();
+  
   const canvas = document.getElementById("chase-minigame");
   const ctx = canvas.getContext("2d");
   const box = { x: canvas.width / 2 - 150, y: canvas.height / 2 - 100, width: 300, height: 200 };
@@ -1574,23 +1577,25 @@ function iniciarMiniGameBatalha() {
   const teclasBatalha = { up: false, down: false, left: false, right: false };
   const balas = [];
 
+  let recebeuDano = false;
+  let timerDano = 0;
+  let vida = 100;
   let playerAlive = true;
-  let balaSpeed = 3 + Math.random() * 2; // velocidade inicial balas topo
+  let balaSpeed = 3 + Math.random() * 2;
   let showMessage = false;
   let message = "";
   let messageIndex = 0;
-
   const messageText = "Você vai morrer";
-  
-  let lateralBalasAtivas = false; // Flag para balas das laterais
+  let lateralBalasAtivas = false;
 
-  // Carregar a imagem do coração
+  let damageEffectFrames = 0;
+  let gameRunning = true; // flag para controle do loop
+
   const heartImage = new Image();
   heartImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Undertale_red_soul.svg/2048px-Undertale_red_soul.svg.png';
 
-  // Carregar a imagem que ficará no topo do quadrado
   const topImage = new Image();
-  topImage.src = 'fredão_chefe.gif'; // Exemplo de imagem
+  topImage.src = 'fredão_chefe.gif';
 
   let heartImageLoaded = false;
   let topImageLoaded = false;
@@ -1601,31 +1606,16 @@ function iniciarMiniGameBatalha() {
     }
   }
 
-  heartImage.onload = () => {
-    heartImageLoaded = true;
-    tryStart();
-  };
-
-  topImage.onload = () => {
-    topImageLoaded = true;
-    tryStart();
-  };
+  heartImage.onload = () => { heartImageLoaded = true; tryStart(); };
+  topImage.onload = () => { topImageLoaded = true; tryStart(); };
 
   function handle(e, isDown) {
     const tecla = e.key.toLowerCase();
     switch (tecla) {
-      case 'arrowup':
-        teclasBatalha.up = isDown;
-        break;
-      case 'arrowdown':
-        teclasBatalha.down = isDown;
-        break;
-      case 'arrowleft':
-        teclasBatalha.left = isDown;
-        break;
-      case 'arrowright':
-        teclasBatalha.right = isDown;
-        break;
+      case 'arrowup': teclasBatalha.up = isDown; break;
+      case 'arrowdown': teclasBatalha.down = isDown; break;
+      case 'arrowleft': teclasBatalha.left = isDown; break;
+      case 'arrowright': teclasBatalha.right = isDown; break;
     }
     e.preventDefault();
   }
@@ -1634,71 +1624,27 @@ function iniciarMiniGameBatalha() {
   document.addEventListener("keyup", e => handle(e, false));
 
   function criarBala() {
-    if (!lateralBalasAtivas) {
-      // Só balas do topo inicialmente
-      balas.push({
-        x: Math.random() * (canvas.width - 10),
-        y: 0,
-        width: 30,
-        height: 30,
-        speed: balaSpeed,
-        direction: 'down' // Direção para saber como mover
-      });
+    if (!gameRunning) return;
+
+    const spawnSide = Math.random();
+    if (!lateralBalasAtivas || spawnSide < 0.5) {
+      balas.push({ x: Math.random() * (canvas.width - 10), y: 0, width: 30, height: 30, speed: balaSpeed, direction: 'down' });
+    } else if (spawnSide < 0.75) {
+      balas.push({ x: 0, y: Math.random() * (canvas.height - 10), width: 30, height: 30, speed: balaSpeed, direction: 'right' });
     } else {
-      // Após 10 segundos: pode criar balas do topo OU das laterais
-      const spawnSide = Math.random();
-      if (spawnSide < 0.5) {
-        // Bala do topo
-        balas.push({
-          x: Math.random() * (canvas.width - 10),
-          y: 0,
-          width: 30,
-          height: 30,
-          speed: balaSpeed,
-          direction: 'down'
-        });
-      } else if (spawnSide < 0.75) {
-        // Bala da esquerda, movendo para a direita
-        balas.push({
-          x: 0,
-          y: Math.random() * (canvas.height - 10),
-          width: 30,
-          height: 30,
-          speed: balaSpeed,
-          direction: 'right'
-        });
-      } else {
-        // Bala da direita, movendo para a esquerda
-        balas.push({
-          x: canvas.width - 30,
-          y: Math.random() * (canvas.height - 10),
-          width: 30,
-          height: 30,
-          speed: balaSpeed,
-          direction: 'left'
-        });
-      }
+      balas.push({ x: canvas.width - 30, y: Math.random() * (canvas.height - 10), width: 30, height: 30, speed: balaSpeed, direction: 'left' });
     }
   }
 
   function moverBalas() {
     for (let i = balas.length - 1; i >= 0; i--) {
       const bala = balas[i];
-      if (bala.direction === 'down') {
-        bala.y += bala.speed;
-        if (bala.y > canvas.height) {
-          balas.splice(i, 1);
-        }
-      } else if (bala.direction === 'right') {
-        bala.x += bala.speed;
-        if (bala.x > canvas.width) {
-          balas.splice(i, 1);
-        }
-      } else if (bala.direction === 'left') {
-        bala.x -= bala.speed;
-        if (bala.x + bala.width < 0) {
-          balas.splice(i, 1);
-        }
+      if (bala.direction === 'down') bala.y += bala.speed;
+      else if (bala.direction === 'right') bala.x += bala.speed;
+      else if (bala.direction === 'left') bala.x -= bala.speed;
+
+      if (bala.x < -30 || bala.x > canvas.width + 30 || bala.y > canvas.height + 30) {
+        balas.splice(i, 1);
       }
     }
   }
@@ -1711,14 +1657,23 @@ function iniciarMiniGameBatalha() {
   }
 
   function checarColisaoBala() {
-    for (const bala of balas) {
+    for (let i = balas.length - 1; i >= 0; i--) {
+      const b = balas[i];
       if (
-        heart.x < bala.x + bala.width &&
-        heart.x + heart.size > bala.x &&
-        heart.y < bala.y + bala.height &&
-        heart.y + heart.size > bala.y
+        heart.x < b.x + b.width &&
+        heart.x + heart.size > b.x &&
+        heart.y < b.y + b.height &&
+        heart.y + heart.size > b.y
       ) {
-        playerAlive = false; // O jogador foi atingido
+        vida -= 20;
+        balas.splice(i, 1);
+  
+        // Ativa o efeito de dano
+        damageEffectFrames = 6;
+        recebeuDano = true;
+        timerDano = 20;
+  
+        if (vida <= 0) playerAlive = false;
       }
     }
   }
@@ -1731,11 +1686,18 @@ function iniciarMiniGameBatalha() {
   }
 
   function desenharHeart() {
-    ctx.drawImage(heartImage, heart.x, heart.y, heart.size, heart.size); // Desenha a imagem do coração
+    if (damageEffectFrames > 0) {
+      if (damageEffectFrames % 2 === 0) {
+        damageEffectFrames--; // decrementa mesmo se não desenhar
+        return;
+      }
+      damageEffectFrames--;
+    }
+    ctx.drawImage(heartImage, heart.x, heart.y, heart.size, heart.size);
   }
 
   function desenharTopImage() {
-    ctx.drawImage(topImage, box.x + (box.width / 2) - 75, box.y - 150, 170, 150);
+    ctx.drawImage(topImage, box.x + box.width / 2 - 75, box.y - 150, 170, 150);
   }
 
   function moverHeart() {
@@ -1745,50 +1707,125 @@ function iniciarMiniGameBatalha() {
     if (teclasBatalha.right && heart.x < box.x + box.width - heart.size) heart.x += heart.speed;
   }
 
-  // Começa a gerar balas a cada 1 segundo
   setInterval(criarBala, 1000);
 
-  // Função para exibir a mensagem com efeito de digitação
-  function typeMessage() {
+  function typeMessage(callback) {
     if (messageIndex < messageText.length) {
-      message += messageText.charAt(messageIndex);
-      messageIndex++;
-      setTimeout(typeMessage, 300); // Tempo entre cada letra
+      message += messageText.charAt(messageIndex++);
+      setTimeout(() => typeMessage(callback), 250);
     } else {
-      balaSpeed += 5; // Aumenta a velocidade das balas após a mensagem
-      setInterval(criarBala,500);
+      balaSpeed += 5;
+      if (callback) callback();
+      setTimeout(() => { showMessage = false; }, 4000);
     }
   }
 
-  // Inicia a digitação da mensagem após 16 segundos
   setTimeout(() => {
     showMessage = true;
     typeMessage();
-  }, 16000); // 10 segundos
+  }, 16000);
+
+  setTimeout(() => {
+    setInterval(criarBala, 700);
+    lateralBalasAtivas = true;
+  }, 20000);
+
+  // 🛑 Após 30 segundos, finaliza o minigame
+  setTimeout(() => {
+    gameRunning = false;
+    finalizarMiniGameBatalha();
+  }, 37000);
+
+  function finalizarMiniGameBatalha() {
+    aloneEnd.pause();
+    aloneEnd.currentTime = 0;
+    aloneEnd2.currentTime = 0;
+    aloneEnd2.play();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+    const telaFinal = document.getElementById("tela-final");
+    const botaoMatar = document.getElementById("botao-matar");
+    const fadeOverlay = document.getElementById("fade-overlay");
+    const videoFinal = document.getElementById("video-final");
+    const telaEgo = document.getElementById("tela-ego");
+  
+    if (telaFinal) telaFinal.style.display = "flex";
+  
+    botaoMatar.onclick = () => {
+      // Oculta botão/tela
+      telaFinal.style.display = "none";
+  
+      // Começa fade-in (escurecendo por 10s)
+      fadeOverlay.style.opacity = "1";
+  
+      setTimeout(() => {
+        // Mostra vídeo após fade-in
+        fadeOverlay.style.opacity = "0"; // remove fade preto após 10s
+        videoFinal.style.display = "block";
+        videoFinal.play();
+  
+        // Quando o vídeo termina
+        videoFinal.onended = () => {
+          // Fade-out (escurecendo por 10s)
+          fadeOverlay.style.opacity = "1";
+  
+          setTimeout(() => {
+            videoFinal.style.display = "none";
+            fadeOverlay.style.opacity = "0"; // tira o fade
+            
+            // Mostra tela final
+            if (telaEgo) telaEgo.style.display = "flex";
+          }, 10000); // após fade-out
+        };
+      }, 10000); // após fade-in
+    };
+  }
 
   function loopBatalha() {
+    if (!gameRunning || !playerAlive) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharBox();
-    desenharTopImage(); // Desenha a imagem no topo
+    desenharTopImage();
     moverHeart();
     desenharHeart();
     moverBalas();
     desenharBalas();
     checarColisaoBala();
 
-    // Desenhar a mensagem se showMessage for true
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Vida: " + vida, 20, 30);
+
     if (showMessage) {
-      ctx.fillStyle = "white";
       ctx.font = "30px Arial";
       ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width / 2, canvas.height / 2);
     }
 
     if (!playerAlive) {
-      ctx.fillStyle = "white";
-      ctx.font = "30px Arial";
-      ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
-      return; // Para o loop se o jogador não estiver mais vivo
+      gameRunning = false;
+    
+      // Pausa a música
+      aloneEnd.pause();
+      aloneEnd.currentTime = 0;
+    
+      // Exibe a tela de morte
+      const telaMorte = document.getElementById("tela-morte");
+      if (telaMorte) {
+        telaMorte.style.display = "flex";
+      }
+    
+      return;
     }
+
+    if (timerDano > 0) {
+      ctx.fillStyle = "red";
+      timerDano--;
+    } else {
+      ctx.fillStyle = "white";
+    }
+    ctx.font = "20px Arial";
+    ctx.fillText("Vida: " + vida, 20, 30);
 
     requestAnimationFrame(loopBatalha);
   }
