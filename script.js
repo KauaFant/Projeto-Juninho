@@ -419,7 +419,7 @@ function nextStory() {
     return;
   }
 
-  if (text === "Você entra com cautela.") {
+  if (storyText.textContent === "Você entra com cautela.") {
     iniciarMoveMinigame();
     return;
   }
@@ -1847,34 +1847,41 @@ const moveMinigame = document.getElementById("move-minigame");
 const moveCanvas = document.getElementById("moveCanvas");
 const ctx = moveCanvas.getContext("2d");
 
-// Adicione aqui a imagem de fundo, se quiser:
+// Verifica se canvas tem tamanho válido
+moveCanvas.width = 800;
+moveCanvas.height = 600;
+
+// Imagens
 const backgroundImg = new Image();
-backgroundImg.src = 'URL_DA_IMAGEM_DE_FUNDO'; // opcional
-
 const playerImg = new Image();
-playerImg.src = 'https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927';
-
 const targetImg = new Image();
-targetImg.src = 'https://static.wikia.nocookie.net/pizzaria-freddy-fazbear/images/0/0b/Baby_Sprite_Idle.gif/revision/latest?cb=20161011172021&path-prefix=pt-br';
 
 let player = { x: 100, y: 100, width: 50, height: 50 };
 let target = { x: 700, y: 500, width: 50, height: 50 };
 let keys = {};
+let allImagesLoaded = 0;
+let isMinigameActive = false;
 
+// Desenha tudo
 function draw() {
   ctx.clearRect(0, 0, moveCanvas.width, moveCanvas.height);
 
-  // Fundo
-  if (backgroundImg.src) {
+  if (backgroundImg.complete) {
     ctx.drawImage(backgroundImg, 0, 0, moveCanvas.width, moveCanvas.height);
   }
 
-  ctx.drawImage(targetImg, target.x, target.y, target.width, target.height);
-  ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+  if (targetImg.complete) {
+    ctx.drawImage(targetImg, target.x, target.y, target.width, target.height);
+  }
+
+  if (playerImg.complete) {
+    ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+  }
 }
 
 function update() {
-  // Movimento com colisão nas bordas
+  if (!isMinigameActive) return; // se não estiver ativo, para o loop
+
   if (keys["ArrowUp"] && player.y > 0) player.y -= 3;
   if (keys["ArrowDown"] && player.y + player.height < moveCanvas.height) player.y += 3;
   if (keys["ArrowLeft"] && player.x > 0) player.x -= 3;
@@ -1887,38 +1894,76 @@ function update() {
     player.y < target.y + target.height &&
     player.y + player.height > target.y
   ) {
+    isMinigameActive = false; // para o loop
     endMoveMinigame();
-    mysterious.pause();
-    mysterious.currentTime = 0;
+    if (typeof mysterious !== "undefined") {
+      mysterious.pause();
+      mysterious.currentTime = 0;
+    }
+    return;
   }
 
   draw();
   requestAnimationFrame(update);
 }
 
+function checkLoaded() {
+  allImagesLoaded++;
+  if (allImagesLoaded === 3) {
+    isMinigameActive = true; // inicia o loop
+    draw();
+    requestAnimationFrame(update);
+  }
+}
+
 function iniciarMoveMinigame() {
-  gameScreen.classList.add("hidden");
+  allImagesLoaded = 0; // Resetar contagem
+
+  // Defina primeiro os src
+  backgroundImg.src = 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/822920/ss_ccfc465fcdebec08484f1eb1ae8bf8a6747bb4ad.1920x1080.jpg?t=1590204819';
+  playerImg.src = 'https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest?cb=20161103224927';
+  targetImg.src = 'https://static.wikia.nocookie.net/pizzaria-freddy-fazbear/images/0/0b/Baby_Sprite_Idle.gif/revision/latest?cb=20161011172021&path-prefix=pt-br';
+
+  // Só depois atribua os onload
+  backgroundImg.onload = checkLoaded;
+  playerImg.onload = checkLoaded;
+  targetImg.onload = checkLoaded;
+
+  // Oculta a tela do jogo (se existir)
+  if (typeof gameScreen !== "undefined") {
+    gameScreen.classList.add("hidden");
+  }
+
   moveMinigame.classList.remove("hidden");
 
   // Resetar posição
   player.x = 100;
   player.y = 100;
-
-  draw();
-  requestAnimationFrame(update);
 }
 
 function endMoveMinigame() {
+  // Oculta a tela do minigame
   moveMinigame.classList.add("hidden");
-  currentPath = [
-    "Você toca no objeto... Uma porta se abre lentamente.",
-    "O que será que vem a seguir?"
-  ];
-  pathIndex = 0;
-  storyText.textContent = currentPath[pathIndex];
-  nextBtn.classList.remove("hidden");
+  
+  // Para o loop do minigame
+  isMinigameActive = false; 
+  
+  // Exibe a tela de morte após 3 segundos de fade
+  const morteScreen = document.getElementById("morte-screen");
+  
+  // Adiciona a classe 'visible' após um pequeno atraso
+  setTimeout(() => {
+    morteScreen.classList.remove("hidden");
+    morteScreen.classList.add("visible");
+  }, 3000); // 3 segundos de atraso
+  
+  // Adiciona evento para reiniciar o jogo
+  document.getElementById("restart-btn").onclick = function() {
+    morteScreen.classList.remove("visible");
+    morteScreen.classList.add("hidden");
+  };
 }
 
-// Controles
+// Teclas
 document.addEventListener("keydown", (e) => keys[e.key] = true);
 document.addEventListener("keyup", (e) => keys[e.key] = false);

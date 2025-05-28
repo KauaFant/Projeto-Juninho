@@ -707,7 +707,7 @@ section {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-image: url('https://i.pinimg.com/originals/8a/e8/26/8ae826dba6a224dba3e49bf045583254.gif'); /* imagem do quarto */
+  background-image: url('https://external-preview.redd.it/quite-satisfied-with-the-void-world-i-managed-to-create-for-v0-aW84MTlhdzlicHJlMcdPr1NwLmr2nCa1tm2fS9pLVcm5bKm7Sce3S-5VNaV8.png?format=pjpg&auto=webp&s=2d0805c0536b6b7c3e135c0a566f93e7120196cc'); /* imagem do quarto */
   background-size: cover;
   overflow: hidden;
 }
@@ -913,3 +913,27 @@ section {
   border: 4px solid white;
   background-color: #111;
 }
+
+#morte-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
+  opacity: 0; /* Começa invisível */
+  transition: opacity 3s ease; /* Transição de 3 segundos */
+}
+
+#morte-screen.visible {
+  opacity: 1; /* Torna visível */
+}
+
+
+
