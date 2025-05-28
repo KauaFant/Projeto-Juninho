@@ -5,7 +5,6 @@ const storyText = document.getElementById("story-text");
 const nextBtn = document.getElementById("next-btn");
 const bgMusic = document.getElementById("bg-music");
 const creepySound = document.getElementById("creepy-sound");
-const scaryMusic = document.getElementById("scary-music");
 const newMusic = document.getElementById("new-music");
 const heart = document.getElementById("heart");
 const backBtn = document.getElementById("back-btn");
@@ -294,8 +293,6 @@ function nextStory() {
     bgMusic.pause();
     newMusic.pause();
     newMusic.currentTime = 0
-    scaryMusic.pause();
-    scaryMusic.currentTime = 0;
   }
 
   if (storyText.textContent === "Então você vai atrás dos outros...") {
@@ -415,6 +412,17 @@ function nextStory() {
     });
     return;
   }
+
+  if (storyText.textContent === "Você fica confuso e decide ajudar") {
+    nextBtn.classList.add("hidden");
+    document.getElementById("enigma-minigame").classList.remove("hidden");
+    return;
+  }
+
+  if (text === "Você entra com cautela.") {
+    iniciarMoveMinigame();
+    return;
+  }
 }
 
 function showStory() {
@@ -464,20 +472,6 @@ function chooseOption1() {
 }
 
 function chooseOption2() {
-  // Pausar qualquer som que já esteja tocando
-  if (!scaryMusic.paused) {
-    scaryMusic.pause();
-    scaryMusic.currentTime = 0; // Reinicia o som
-  }
-
-  // Pausar a música de fundo
-  bgMusic.pause();
-  bgMusic.currentTime = 0; // Reinicia a música de fundo
-
-  // Tocar a música de susto
-  scaryMusic.currentTime = 0;
-  scaryMusic.play();
-
   // Mudar para a história do quarto
   currentPath = storybedroom;
   pathIndex = 0;
@@ -604,7 +598,7 @@ function startChaseMinigame() {
   run.play();
 
   // Pausar músicas existentes
-  [bgMusic, creepySound, scaryMusic, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
+  [bgMusic, creepySound, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
     audio.pause();
     audio.currentTime = 0;
   });
@@ -623,7 +617,7 @@ function startChaseMinigame() {
     y: 50,
     width: 60,
     height: 60,
-    speed: 2.6,
+    speed: 2.4,
     color: "#ff0000"
   };
 
@@ -1143,7 +1137,6 @@ function stopBackgroundAndLanternEffect() {
   const musicElements = [
     bgMusic,
     creepySound,
-    scaryMusic,
     heart,
     newMusic,
     fnafMiniGameSound,
@@ -1198,7 +1191,6 @@ function showCowardEnding() {
   // Pausa as músicas
   bgMusic.pause();
   creepySound.pause();
-  scaryMusic.pause();
   heart.pause();
   newMusic.pause();
   fnafMiniGameSound.pause();
@@ -1439,7 +1431,7 @@ function iniciarMiniGameInimigos() {
   canvas.classList.remove("hidden");
 
   // Pausar músicas existentes
-  [bgMusic, creepySound, scaryMusic, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
+  [bgMusic, creepySound, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
     audio.pause();
     audio.currentTime = 0;
   });
@@ -1728,13 +1720,13 @@ function iniciarMiniGameBatalha() {
   setTimeout(() => {
     setInterval(criarBala, 700);
     lateralBalasAtivas = true;
-  }, 20000);
+  }, 22000);
 
   // 🛑 Após 30 segundos, finaliza o minigame
   setTimeout(() => {
     gameRunning = false;
     finalizarMiniGameBatalha();
-  }, 37000);
+  }, 36000);
 
   function finalizarMiniGameBatalha() {
     aloneEnd.pause();
@@ -1830,3 +1822,103 @@ function iniciarMiniGameBatalha() {
     requestAnimationFrame(loopBatalha);
   }
 }
+
+function verificarEnigma(resposta) {
+  const feedback = document.getElementById("enigma-feedback");
+  if (resposta === "mapa") {
+    feedback.textContent = "Correto! Você pode continuar.";
+    setTimeout(() => {
+      document.getElementById("enigma-minigame").classList.add("hidden");
+      nextBtn.classList.remove("hidden");
+      currentPath = [
+        "Você resolve o enigma e a parede começa a se mover.",
+        "Atrás dela, há uma passagem secreta escura...",
+        "Você entra com cautela."
+      ];
+      pathIndex = 0;
+      storyText.textContent = currentPath[pathIndex];
+    }, 2000);
+  } else {
+    feedback.textContent = "Errado! Tente novamente.";
+  }
+}
+
+const moveMinigame = document.getElementById("move-minigame");
+const moveCanvas = document.getElementById("moveCanvas");
+const ctx = moveCanvas.getContext("2d");
+
+// Adicione aqui a imagem de fundo, se quiser:
+const backgroundImg = new Image();
+backgroundImg.src = 'URL_DA_IMAGEM_DE_FUNDO'; // opcional
+
+const playerImg = new Image();
+playerImg.src = 'https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927';
+
+const targetImg = new Image();
+targetImg.src = 'https://static.wikia.nocookie.net/pizzaria-freddy-fazbear/images/0/0b/Baby_Sprite_Idle.gif/revision/latest?cb=20161011172021&path-prefix=pt-br';
+
+let player = { x: 100, y: 100, width: 50, height: 50 };
+let target = { x: 700, y: 500, width: 50, height: 50 };
+let keys = {};
+
+function draw() {
+  ctx.clearRect(0, 0, moveCanvas.width, moveCanvas.height);
+
+  // Fundo
+  if (backgroundImg.src) {
+    ctx.drawImage(backgroundImg, 0, 0, moveCanvas.width, moveCanvas.height);
+  }
+
+  ctx.drawImage(targetImg, target.x, target.y, target.width, target.height);
+  ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
+}
+
+function update() {
+  // Movimento com colisão nas bordas
+  if (keys["ArrowUp"] && player.y > 0) player.y -= 3;
+  if (keys["ArrowDown"] && player.y + player.height < moveCanvas.height) player.y += 3;
+  if (keys["ArrowLeft"] && player.x > 0) player.x -= 3;
+  if (keys["ArrowRight"] && player.x + player.width < moveCanvas.width) player.x += 3;
+
+  // Colisão com o alvo
+  if (
+    player.x < target.x + target.width &&
+    player.x + player.width > target.x &&
+    player.y < target.y + target.height &&
+    player.y + player.height > target.y
+  ) {
+    endMoveMinigame();
+    mysterious.pause();
+    mysterious.currentTime = 0;
+  }
+
+  draw();
+  requestAnimationFrame(update);
+}
+
+function iniciarMoveMinigame() {
+  gameScreen.classList.add("hidden");
+  moveMinigame.classList.remove("hidden");
+
+  // Resetar posição
+  player.x = 100;
+  player.y = 100;
+
+  draw();
+  requestAnimationFrame(update);
+}
+
+function endMoveMinigame() {
+  moveMinigame.classList.add("hidden");
+  currentPath = [
+    "Você toca no objeto... Uma porta se abre lentamente.",
+    "O que será que vem a seguir?"
+  ];
+  pathIndex = 0;
+  storyText.textContent = currentPath[pathIndex];
+  nextBtn.classList.remove("hidden");
+}
+
+// Controles
+document.addEventListener("keydown", (e) => keys[e.key] = true);
+document.addEventListener("keyup", (e) => keys[e.key] = false);

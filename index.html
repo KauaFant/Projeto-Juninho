@@ -156,6 +156,17 @@
 <div id="tela-ego" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:white; font-size:60px; font-family:sans-serif; justify-content:center; align-items:center; z-index:10001;">
   Final Ego
 </div>
+<div id="enigma-minigame" class="hidden">
+  <h2>Resolva o enigma:</h2>
+  <p>“Tenho cidades, mas não casas. Tenho montanhas, mas não árvores. Tenho água, mas não peixes. O que sou eu?”</p>
+  <button onclick="verificarEnigma('mapa')">A) Um mapa</button>
+  <button onclick="verificarEnigma('oceano')">B) Um oceano</button>
+  <button onclick="verificarEnigma('floresta')">C) Uma floresta</button>
+  <p id="enigma-feedback"></p>
+</div>
+<div id="move-minigame" class="hidden">
+  <canvas id="moveCanvas" width="800" height="600"></canvas>
+</div>
   <canvas id="chase-minigame" width="600" height="600" class="hidden"></canvas>
   <audio id="bg-music" loop>
     <source src="Hollow Knight OST - Dream.mp3" type="audio/mp3">
@@ -167,10 +178,6 @@
 
   <audio id="creepy-sound">
     <source src="SOM VIDRO QUEBRANDO.mp3" type="audio/mp3">
-  </audio>
-
-  <audio id="scary-music" loop>
-    <source src="Som Assustador De Vento forte a Noite Num Cemitério..mp3" type="audio/mp3">
   </audio>
 
   <audio id="new-music">
