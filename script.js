@@ -23,6 +23,7 @@ const escolha = document.getElementById("escolhas");
 const alone = document.getElementById("Evil");
 const aloneEnd = document.getElementById("end");
 const aloneEnd2 = document.getElementById("Evil2");
+const gameOverMusic = document.getElementById("game-over-music");
 
 let storyIndex = 0;
 let currentPath = null;
@@ -89,7 +90,7 @@ const sotao = [
   "O ambiente esta escuro, você começa escutar barulhos estranhos",
   "Parecem sussurros pedindo por ajuda",
   "Com a lanterna ligada, você começa a procurar a fonte da voz.."
-]
+];
 
 const sotao2 = [
   "Você se assusta com o que acabou de ver",
@@ -99,16 +100,15 @@ const sotao2 = [
   "Nesse momento, ele se levanta e vem em sua direção pedindo ajuda",
   "Você cai para trás, assustado, e avista um taco de beisebol",
   "Você se vê diante a um impasse"
-]
+];
 
 const evil = [
   "Você ataca ele, ele chora e implora por ajuda",
   "Você continua batendo nele. Você destrói ele.",
   "Voce percebe que pode destrui-los...",
   "Então você vai atrás dos outros..."
-]
+];
 
-// Eventos
 startBtn.addEventListener("click", startGame);
 nextBtn.addEventListener("click", nextStory);
 choice1Btn.addEventListener("click", chooseOption1);
@@ -117,36 +117,27 @@ choice2Btn.addEventListener("click", chooseOption2);
 function startGame() {
   intro.currentTime = 0;
   intro.play();
-  // Inicia o fade-out da tela de início
   startScreen.classList.add("fade-out");
-  startScreen.style.transition = "opacity 2s ease"; // Transição suave
-  startScreen.style.opacity = "0"; // Tornando a tela invisível com o fade
+  startScreen.style.transition = "opacity 2s ease";
+  startScreen.style.opacity = "0";
 
-  // Espera 2 segundos antes de trocar de tela
   setTimeout(() => {
     intro.pause();
     intro.currentTime = 0;
-    startScreen.classList.add("hidden"); // Esconde a tela de início completamente
+    startScreen.classList.add("hidden");
     const medrosoBtn = document.getElementById("Medroso");
-    medrosoBtn.classList.add("hidden");     // Esconde o botão
-    medrosoBtn.classList.remove("active");  // Remove efeito ativo
-    medrosoBtn.style.pointerEvents = "none"; // Impede clique
+    medrosoBtn.classList.add("hidden");
+    medrosoBtn.classList.remove("active");
+    medrosoBtn.style.pointerEvents = "none";
 
-    gameScreen.classList.remove("hidden"); // Exibe a tela do jogo
-
-    // Inicia a música de fundo após o fade-out
-    bgMusic.play(); 
-
-    // Restaura o índice da história e exibe o conteúdo inicial
+    gameScreen.classList.remove("hidden");
+    bgMusic.play();
     storyIndex = 0;
-    showStory(); // Exibe o conteúdo da história
-    nextBtn.classList.remove("hidden"); // Mostra o botão de avançar
-    backBtn.classList.remove("hidden"); // Mostra o botão de voltar
-
-    // Remover a classe para permitir reiniciar depois
+    showStory();
+    nextBtn.classList.remove("hidden");
+    backBtn.classList.remove("hidden");
     startScreen.classList.remove("fade-out");
-
-  }, 2000); // Tempo de espera para o fade-out
+  }, 2000);
 }
 
 function nextStory() {
@@ -155,11 +146,10 @@ function nextStory() {
     if (pathIndex < currentPath.length) {
       storyText.textContent = currentPath[pathIndex];
 
-      // Verifica a frase para iniciar o minigame
       if (currentPath[pathIndex] === "Você sai do quarto..") {
-        gameScreen.classList.add("hidden"); // Esconde a tela do jogo
-        startChaseMinigame(); // Inicia o novo minigame
-        return; // Para a progressão da história
+        gameScreen.classList.add("hidden");
+        startChaseMinigame();
+        return;
       }
 
       if (currentPath[pathIndex] === "Parece que o jogo acabou...") {
@@ -169,24 +159,20 @@ function nextStory() {
         heart.currentTime = 0;
         heart.play();
         startFnafChaos();
-        
-        return; // Para impedir que o botão avance mais a história
+        return;
       }
       if (currentPath[pathIndex] === "Você quer ir?") {
-        // Oculta o botão de próximo passo e mostra os novos botões
         nextBtn.classList.add("hidden");
-        choicesDiv.classList.add("hidden"); // Se necessário, oculta o container antigo
+        choicesDiv.classList.add("hidden");
       
         const newGameButtons = document.getElementById("new-game-buttons");
-        newGameButtons.style.display = "block"; // Torna os novos botões visíveis
+        newGameButtons.style.display = "block";
       
-        // Define ações para os botões
         const yesButton = document.getElementById("yes");
         const noButton = document.getElementById("no");
       
-        // Ação para o botão "Sim"
         yesButton.onclick = () => {
-          currentPath = [ // Novo caminho para o "Sim"
+          currentPath = [
             "Você decide ajudar a voz desconhecida.",
             "Parece que na parede tem um enigma",
             "Você fica confuso e decide ajudar"
@@ -194,14 +180,12 @@ function nextStory() {
           pathIndex = 0;
           storyText.textContent = currentPath[pathIndex];
       
-          // Oculta os botões e mostra o botão de próximo passo
           newGameButtons.style.display = "none";
           nextBtn.classList.remove("hidden");
         };
       
-        // Ação para o botão "Não"
         noButton.onclick = () => {
-          currentPath = [ // Novo caminho para o "Não"
+          currentPath = [
             "Você decide não confiar na voz misteriosa.",
             "Você corre para longe da voz.",
             "Você entra na cozinha... Mas..",
@@ -211,20 +195,17 @@ function nextStory() {
           pathIndex = 0;
           storyText.textContent = currentPath[pathIndex];
       
-          // Oculta os botões e mostra o botão de próximo passo
           newGameButtons.style.display = "none";
           nextBtn.classList.remove("hidden");
         };
       }
 
-      // Verifica a frase para aplicar ou remover o fundo
       if (storyText.textContent === "Você liga sua lanterna, olha para a porta com medo.") {
         document.body.classList.add('background-image');
       } else {
         document.body.classList.remove('background-image');
       }
 
-      // Sons da trilha alternativa
       if (storyText.textContent === "De repente, a lanterna pisca — algo se moveu ao fundo.") {
         heart.currentTime = 0;
         heart.play();
@@ -249,19 +230,17 @@ function nextStory() {
         alone.play();
       }
 
-
     } else {
       currentPath = null;
       nextBtn.classList.add("hidden");
       bgMusic.pause();
-      document.body.classList.remove('background-image'); // Limpa fundo ao final
+      document.body.classList.remove('background-image');
     }
   } else {
     storyIndex++;
     if (storyIndex < storyLines.length) {
       showStory();
 
-      // Sons da trilha principal
       if (storyLines[storyIndex] === "Barulhos estranhos aparecem, aparentemente vêm da sala.") {
         creepySound.currentTime = 0;
         creepySound.play();
@@ -271,12 +250,12 @@ function nextStory() {
       nextBtn.classList.add("hidden");
       alert("Fim do jogo! Obrigado por jogar.");
       bgMusic.pause();
-      document.body.classList.remove('background-image'); // Limpa fundo ao final
+      document.body.classList.remove('background-image');
     }
   }
   if (storyText.textContent === "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte") {
     heart.volume = 0.0;
-    heart.playbackRate = 2.0; // Aumenta a velocidade do som
+    heart.playbackRate = 2.0;
     heart.currentTime = 0;
     heart.play();
   
@@ -322,7 +301,6 @@ function nextStory() {
   }
 
   if (currentPath && currentPath[pathIndex] === "Com a lanterna ligada, você começa a procurar a fonte da voz..") {
-    // Escurece a tela antes do minigame
     const overlay = document.createElement("div");
     overlay.id = "fade-overlay";
     overlay.style.position = "fixed";
@@ -359,26 +337,25 @@ function nextStory() {
   }
 
   if (storyText.textContent === "Você se vê diante a um impasse") {
-    nextBtn.classList.add("hidden"); // Esconde o botão "Avançar"
+    nextBtn.classList.add("hidden");
     
     const impasseButtons = document.getElementById("impasse-buttons");
     impasseButtons.classList.remove("hidden");
   
-    // Garante que o efeito ocorra após o display mudar
     setTimeout(() => {
       impasseButtons.classList.add("visible");
     }, 10);
   
-    return; // Para impedir que continue avançando a história
+    return;
   }
 
   if (storyText.textContent === "Você sente mais medo..") {
     newMusic.currentTime = 0;
     newMusic.play();
-    gameScreen.classList.add("hidden"); // Esconde o jogo normal
-    document.getElementById("minigame-room").classList.remove("hidden"); // Mostra o minigame
+    gameScreen.classList.add("hidden");
+    document.getElementById("minigame-room").classList.remove("hidden");
     iniciarMiniGame();
-    return; // Para a progressão da história até o minigame terminar
+    return;
   }
 
   if (storyText.textContent === "Você chega na porta da sala, abre a porta e...") {
@@ -429,7 +406,7 @@ function showStory() {
   storyText.textContent = storyLines[storyIndex];
   if (storyText.textContent === "Você finalmente chega no andar de baixo. Está escuro, seu coração bate mais forte") {
     heart.volume = 0.1;
-    heart.playbackRate = 2.0; // Aumenta a velocidade aqui também
+    heart.playbackRate = 2.0;
     heart.currentTime = 0;
     heart.play();
   
@@ -443,14 +420,12 @@ function showStory() {
     }, 300);
   }
 
-  // Verifica a frase para aplicar ou remover o fundo
   if (storyLines[storyIndex] === "Você liga sua lanterna, olha para a porta com medo.") {
     document.body.classList.add('background-image');
   } else {
     document.body.classList.remove('background-image');
   }
 
-  // Se for o último texto da história principal, mostra escolhas
   if (storyIndex === storyLines.length - 1) {
     showChoices();
   }
@@ -472,7 +447,6 @@ function chooseOption1() {
 }
 
 function chooseOption2() {
-  // Mudar para a história do quarto
   currentPath = storybedroom;
   pathIndex = 0;
   storyText.textContent = currentPath[pathIndex];
@@ -586,7 +560,7 @@ function iniciarMiniGame() {
   document.addEventListener("keydown", handleKeydown);
   document.addEventListener("keyup", handleKeyup);
 
-  const gameLoop = setInterval(moverPlayer, 20); // Executa 50x por segundo
+  const gameLoop = setInterval(moverPlayer, 20);
 }
 
 function startChaseMinigame() {
@@ -597,7 +571,6 @@ function startChaseMinigame() {
   run.loop = true;
   run.play();
 
-  // Pausar músicas existentes
   [bgMusic, creepySound, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
     audio.pause();
     audio.currentTime = 0;
@@ -686,10 +659,9 @@ function startChaseMinigame() {
   keyImage.src = "https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif";
 
   const doorImage = new Image();
-  doorImage.src = "sótão.png"
+  doorImage.src = "img/sótão.png"
 
   function gameLoop() {
-    // Movimentação do jogador
     if (keys.ArrowUp && player.y > 0) player.y -= player.speed;
     if (keys.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
     if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
@@ -697,20 +669,17 @@ function startChaseMinigame() {
 
     updateEnemy();
 
-    // Verificar colisão com inimigo
     if (checkCollision(player, enemy)) {
       endMinigame();
       playDeathVideo();
       return;
     }
 
-    // Verificar colisão com chave
     if (!key.collected && checkCollision(player, key)) {
       key.collected = true;
       hasKey = true;
     }
 
-    // Verificar colisão com porta
     if (checkCollision(player, door)) {
       if (hasKey) {
         endMinigame();
@@ -719,10 +688,8 @@ function startChaseMinigame() {
       }
     }
 
-    // Limpar tela
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Desenhar jogador
     if (playerImage.complete) {
       ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
     } else {
@@ -730,7 +697,6 @@ function startChaseMinigame() {
       ctx.fillRect(player.x, player.y, player.width, player.height);
     }
 
-    // Desenhar inimigo
     if (enemyImage.complete) {
       ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
     } else {
@@ -738,7 +704,6 @@ function startChaseMinigame() {
       ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
     }
 
-    // Desenhar chave
     if (!key.collected) {
       if (keyImage.complete) {
         ctx.drawImage(keyImage, key.x, key.y, key.width, key.height);
@@ -748,7 +713,6 @@ function startChaseMinigame() {
       }
     }
 
-    // Desenhar porta
     if (doorImage.complete) {
       ctx.drawImage(doorImage, door.x, door.y, door.width, door.height);
     } else {
@@ -768,11 +732,9 @@ function startChaseMinigame() {
     run.pause();
     run.currentTime = 0;
   
-    // Inicia a sequência do sótão
     currentPath = sotao;
     pathIndex = 0;
     storyText.textContent = currentPath[pathIndex];
-    // Garante que os botões relevantes estejam visíveis após o minigame
     gameScreen.classList.remove("hidden");
     nextBtn.classList.remove("hidden");
     escolha.currentTime = 0;
@@ -808,158 +770,129 @@ const dangerBtn = document.getElementById("danger-btn");
 let flashlightOn = false;
 let dangerTimeout;
 
-  function startFnafScene() {
-    // Fade da música atual
-    bgMusic.pause();
-    creepySound.pause();
+function startFnafScene() {
+  bgMusic.pause();
+  creepySound.pause();
+  fnafMiniGameSound.currentTime = 0;
+  fnafMiniGameSound.play();
+  document.body.style.transition = "opacity 2s ease";
+  document.body.style.opacity = "0";
   
-    // Toca o som do mini game FNaF
-    fnafMiniGameSound.currentTime = 0; // Reseta o áudio
-    fnafMiniGameSound.play(); // Começa o som
+  setTimeout(() => {
+    gameScreen.classList.add("hidden");
+    fnafScene.classList.remove("hidden");
+    document.body.style.opacity = "1";
+  }, 2000);
   
-    // Fade to black por 2 segundos
-    document.body.style.transition = "opacity 2s ease";
-    document.body.style.opacity = "0";
-    
-    setTimeout(() => {
-      gameScreen.classList.add("hidden");
-      fnafScene.classList.remove("hidden");
-      document.body.style.opacity = "1";
-    }, 2000);
-    
-    // Resetar controles
-    flashlightOn = false;
-    dangerBtn.classList.add("hidden");
-    
-    // Começa o cronômetro para continuar história se jogador não apertar o botão
-    dangerTimeout = setTimeout(() => {
-      endFnafScene(); // Aqui você vai terminar a cena FNaF caso o jogador não clique a tempo
-    }, 18000); // 18 segundos
+  flashlightOn = false;
+  dangerBtn.classList.add("hidden");
+  
+  dangerTimeout = setTimeout(() => {
+    endFnafScene();
+  }, 18000);
+}
+
+fnafCanvas.addEventListener("mousemove", (e) => {
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const radius = 100;
+
+  const dx = e.clientX - centerX;
+  const dy = e.clientY - centerY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < radius) {
+    dangerBtn.style.display = "block";
+  } else {
+    dangerBtn.style.display = "none";
   }
+});
 
-  fnafCanvas.addEventListener("mousemove", (e) => {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const radius = 100; // área sensível ao redor do centro
+flashlightBtn.addEventListener("click", () => {
+  flashlightOn = !flashlightOn;
   
-    const dx = e.clientX - centerX;
-    const dy = e.clientY - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-  
-    if (distance < radius) {
-      dangerBtn.style.display = "block"; // mostra o botão
-    } else {
-      dangerBtn.style.display = "none"; // esconde se sair do centro
-    }
-  });
-
-  flashlightBtn.addEventListener("click", () => {
-    flashlightOn = !flashlightOn;
-    
-    // Esconder imagem ao voltar ao início
-    backBtn.addEventListener("click", () => {
-      lightReveal.style.display = "none";
-      // outras coisas que já ocorrem aqui, como resetar a história
-    });
-  
-    // Esconder imagem ao morrer e clicar em "tentar novamente"
-    retryBtn.addEventListener("click", () => {
-      lightReveal.style.display = "none";
-    });
-  
-    if (flashlightOn) {
-      fnafCanvas.addEventListener("mousemove", moveLantern);
-      fnafCanvas.style.background = "none";
-      fnafLightReveal.style.display = "block"; // Mostra imagem de fundo iluminada
-      lanternOn = true;
-      flashlightBtn.classList.add("active");
-    
-      // Esconde o cursor
-      fnafCanvas.style.cursor = "none";
-    } else {
-      fnafCanvas.removeEventListener("mousemove", moveLantern);
-      fnafCanvas.style.background = "black";
-      fnafLightReveal.style.display = "none"; // Esconde a imagem iluminada
-      lanternOn = false;
-      flashlightBtn.classList.remove("active");
-    
-      // Mostra o cursor novamente
-      fnafCanvas.style.cursor = "default";
-    }
-  
-    if (flashlightOn) {
-      dangerBtn.classList.remove("hidden");
-    } else {
-      dangerBtn.classList.add("hidden");
-    }
+  backBtn.addEventListener("click", () => {
+    lightReveal.style.display = "none";
   });
   
-  dangerBtn.addEventListener("click", () => {
-    clearTimeout(dangerTimeout);  // Para o tempo de perigo
-    fnafScene.classList.add("hidden");
-  
-    // PAUSA o som do mini game
-    fnafMiniGameSound.pause();
-    fnafMiniGameSound.currentTime = 0;
-  
-    // Mostra o vídeo de susto
-    const videoContainer = document.getElementById("video-container");
-    const scaryVideo = document.getElementById("scary-video");
-  
-    videoContainer.classList.remove("hidden");
-    scaryVideo.currentTime = 0;
-    scaryVideo.play();
-  
-    // Quando o vídeo terminar, mostrar a tela de morte
-    scaryVideo.onended = () => {
-      videoContainer.classList.add("hidden");
-      deathScreen.classList.remove("hidden");
-    
-      const deathText = document.getElementById("death-text");
-      deathText.classList.remove("hidden"); // <-- mostra o texto
-    };
+  retryBtn.addEventListener("click", () => {
+    lightReveal.style.display = "none";
   });
-
-
-  function endFnafScene() {
-    fnafScene.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
   
-    currentPath = postFnafLines;
-    pathIndex = 0;
-    storyText.textContent = currentPath[pathIndex];
-    nextBtn.classList.remove("hidden");
-  
-    fnafMiniGameSound.pause();
-    fnafMiniGameSound.currentTime = 0;
-  
+  if (flashlightOn) {
+    fnafCanvas.addEventListener("mousemove", moveLantern);
+    fnafCanvas.style.background = "none";
+    fnafLightReveal.style.display = "block";
+    lanternOn = true;
+    flashlightBtn.classList.add("active");
+    fnafCanvas.style.cursor = "none";
+  } else {
+    fnafCanvas.removeEventListener("mousemove", moveLantern);
+    fnafCanvas.style.background = "black";
     fnafLightReveal.style.display = "none";
     lanternOn = false;
+    flashlightBtn.classList.remove("active");
+    fnafCanvas.style.cursor = "default";
   }
-
-
-  function moveLantern(e) {
-    const x = e.clientX;
-    const y = e.clientY;
-    fnafCanvas.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.85) 200px, rgba(0,0,0,1) 400px)`;
   
-    if (lanternOn) {
-      const buttons = document.querySelectorAll(".chaos-button");
-  
-      buttons.forEach((btn) => {
-        const rect = btn.getBoundingClientRect();
-        const btnX = rect.left + rect.width / 2;
-        const btnY = rect.top + rect.height / 2;
-  
-        const distance = Math.sqrt((x - btnX) ** 2 + (y - btnY) ** 2);
-        if (distance < 100) {
-          btn.classList.add("visible");
-        } else {
-          btn.classList.remove("visible");
-        }
-      });
-    }
+  if (flashlightOn) {
+    dangerBtn.classList.remove("hidden");
+  } else {
+    dangerBtn.classList.add("hidden");
   }
+});
+
+dangerBtn.addEventListener("click", () => {
+  clearTimeout(dangerTimeout);
+  fnafScene.classList.add("hidden");
+  fnafMiniGameSound.pause();
+  fnafMiniGameSound.currentTime = 0;
+  const videoContainer = document.getElementById("video-container");
+  const scaryVideo = document.getElementById("scary-video");
+  videoContainer.classList.remove("hidden");
+  scaryVideo.currentTime = 0;
+  scaryVideo.play();
+  scaryVideo.onended = () => {
+    videoContainer.classList.add("hidden");
+    deathScreen.classList.remove("hidden");
+    const deathText = document.getElementById("death-text");
+    deathText.classList.remove("hidden");
+  };
+});
+
+function endFnafScene() {
+  fnafScene.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  currentPath = postFnafLines;
+  pathIndex = 0;
+  storyText.textContent = currentPath[pathIndex];
+  nextBtn.classList.remove("hidden");
+  fnafMiniGameSound.pause();
+  fnafMiniGameSound.currentTime = 0;
+  fnafLightReveal.style.display = "none";
+  lanternOn = false;
+}
+
+function moveLantern(e) {
+  const x = e.clientX;
+  const y = e.clientY;
+  fnafCanvas.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.85) 200px, rgba(0,0,0,1) 400px)`;
+  
+  if (lanternOn) {
+    const buttons = document.querySelectorAll(".chaos-button");
+    buttons.forEach((btn) => {
+      const rect = btn.getBoundingClientRect();
+      const btnX = rect.left + rect.width / 2;
+      const btnY = rect.top + rect.height / 2;
+      const distance = Math.sqrt((x - btnX) ** 2 + (y - btnY) ** 2);
+      if (distance < 100) {
+        btn.classList.add("visible");
+      } else {
+        btn.classList.remove("visible");
+      }
+    });
+  }
+}
 
 retryBtn.addEventListener("click", () => {
   deathScreen.classList.add("hidden");
@@ -980,7 +913,7 @@ document.addEventListener("mousemove", (e) => {
 function typeWriter(text, element, speed = 100, callback = null) {
   let i = 0;
   element.textContent = "";
-  element.classList.add("typing-rosa"); // Adiciona a cor rosa
+  element.classList.add("typing-rosa");
 
   function type() {
     if (i < text.length) {
@@ -1038,7 +971,7 @@ function startFnafChaos() {
 }
 
 function toggleCowardLight() {
-  console.log("Botão Luz foi clicado!"); // Adiciona um log para depuração
+  console.log("Botão Luz foi clicado!");
   cowardLightOn = !cowardLightOn;
   
   const medrosoBtn = document.getElementById("Medroso");
@@ -1058,7 +991,7 @@ function toggleCowardLight() {
   if (cowardLightOn) {
     document.addEventListener("mousemove", followMouse);
     if (!countdownStarted) {
-      startCountdown();  // Inicia a contagem regressiva quando a luz for ativada
+      startCountdown();
       countdownStarted = true;
     }
   } else {
@@ -1069,10 +1002,9 @@ function toggleCowardLight() {
 function createChaosButtons() {
   const chaosContainer = document.getElementById("chaos-container");
 
-  // Primeiro criamos o botão especial escondido
   const specialButton = document.createElement("button");
-  specialButton.textContent = "APERTE"; // igual aos outros
-  specialButton.className = "chaos-button special"; // adiciona uma classe especial
+  specialButton.textContent = "APERTE";
+  specialButton.className = "chaos-button special";
   specialButton.style.position = "absolute";
   specialButton.style.top = `${Math.random() * 90}%`;
   specialButton.style.left = `${Math.random() * 90}%`;
@@ -1081,15 +1013,14 @@ function createChaosButtons() {
   specialButton.dataset.reveal = "false";
 
   specialButton.addEventListener("click", () => {
-    chaosContainer.remove(); // tira o caos
-    stopBackgroundAndLanternEffect(); // chama a função para parar a imagem e o efeito de lanterna
-    continueStoryFromSpecialButton(); // chama a função para continuar a história
+    chaosContainer.remove();
+    stopBackgroundAndLanternEffect();
+    continueStoryFromSpecialButton();
   });
 
   chaosContainer.appendChild(specialButton);
 
-  // Agora criamos os outros botões normais
-  for (let i = 0; i < 29; i++) { // 29 porque já criamos 1 especial
+  for (let i = 0; i < 29; i++) {
     const btn = document.createElement("button");
     btn.textContent = "APERTE";
     btn.className = "chaos-button";
@@ -1102,7 +1033,7 @@ function createChaosButtons() {
 
     btn.addEventListener("click", () => {
       chaosContainer.remove();
-      showCowardEnding(); // clica num normal, vai para o final medroso
+      showCowardEnding();
     });
 
     chaosContainer.appendChild(btn);
@@ -1110,30 +1041,20 @@ function createChaosButtons() {
 }
 
 function stopBackgroundAndLanternEffect() {
-  // Parar o efeito da lanterna
-  document.removeEventListener("mousemove", followMouse);  // Remove o evento de movimento do mouse
-
-  // Parar a animação da lanterna (caso você tenha alguma animação CSS)
+  document.removeEventListener("mousemove", followMouse);
   const cozinha = document.getElementById("cozinha");
-  cozinha.style.display = "none"; // Esconde a imagem da lanterna ou desativa o efeito
-
+  cozinha.style.display = "none";
   const chaosContainer = document.getElementById("chaos-container");
   if (chaosContainer) chaosContainer.remove();
-
-  // Se houver uma camada de fundo específica, você também pode removê-la:
   const backgroundLayer = document.getElementById("background-layer");
   if (backgroundLayer) {
-    backgroundLayer.style.display = "none"; // Esconde a camada de fundo
+    backgroundLayer.style.display = "none";
   }
-
-  // Parar a contagem regressiva
-  clearInterval(countdownTimer);  // Limpa o intervalo da contagem regressiva
+  clearInterval(countdownTimer);
   const countdownDisplay = document.getElementById("countdown-display");
   if (countdownDisplay) {
-    countdownDisplay.textContent = "Contagem regressiva interrompida";  // Exibe uma mensagem indicando que a contagem foi interrompida
+    countdownDisplay.textContent = "Contagem regressiva interrompida";
   }
-
-  // Parar as músicas
   const musicElements = [
     bgMusic,
     creepySound,
@@ -1143,52 +1064,42 @@ function stopBackgroundAndLanternEffect() {
     mysterious,
     fear
   ];
-
-  // Interrompe todas as músicas que estão tocando
   musicElements.forEach(music => {
     if (music && !music.paused) {
-      music.pause();  // Pausa a música
-      music.currentTime = 0;  // Reseta o tempo da música para o início
+      music.pause();
+      music.currentTime = 0;
     }
   });
-
-    // Esconde o botão "Luz"
-    const medrosoBtn = document.getElementById("Medroso");
-    if (medrosoBtn) {
-      medrosoBtn.style.display = "none"; // Isso vai esconder o botão "Luz"
-    }
+  const medrosoBtn = document.getElementById("Medroso");
+  if (medrosoBtn) {
+    medrosoBtn.style.display = "none";
+  }
 }
 
 function followMouse(e) {
   const cozinha = document.getElementById("cozinha");
   cozinha.style.setProperty('--x', `${e.clientX}px`);
   cozinha.style.setProperty('--y', `${e.clientY}px`);
-
   const buttons = document.querySelectorAll(".chaos-button");
-
   buttons.forEach((btn) => {
     const rect = btn.getBoundingClientRect();
     const btnX = rect.left + rect.width / 2;
     const btnY = rect.top + rect.height / 2;
     const distance = Math.sqrt((e.clientX - btnX) ** 2 + (e.clientY - btnY) ** 2);
-
     if (distance < 100) {
-      btn.classList.add("visible"); // Torna o botão visível
+      btn.classList.add("visible");
     } else {
-      btn.classList.remove("visible"); // Torna o botão invisível
+      btn.classList.remove("visible");
     }
   });
 }
 
-let cowardEndingStarted = false; // <- variável de controle no começo do seu script
+let cowardEndingStarted = false;
 
 function showCowardEnding() {
-  if (cowardEndingStarted) return; // Se já chamou, não chama de novo
-  cowardEndingStarted = true; // Marca que já começou
-
+  if (cowardEndingStarted) return;
+  cowardEndingStarted = true;
   gameScreen.classList.add("hidden");
-  
-  // Pausa as músicas
   bgMusic.pause();
   creepySound.pause();
   heart.pause();
@@ -1196,89 +1107,61 @@ function showCowardEnding() {
   fnafMiniGameSound.pause();
   mysterious.pause();
   fear.pause();
-
-  // Exibe o vídeo
   const videoContainer = document.getElementById("gameover-video-container");
   const video = document.getElementById("gameover-video");
-
   videoContainer.classList.remove("hidden");
-  video.currentTime = 0; // Garante que o vídeo comece do início
+  video.currentTime = 0;
   video.play();
-
-  // Quando o vídeo terminar, mostra a tela final
   video.onended = () => {
     videoContainer.classList.add("hidden");
     const cowardEnding = document.getElementById("coward-ending");
     cowardEnding.classList.remove("hidden");
-
-    const gameOverMusic = document.getElementById("game-over-music");
     gameOverMusic.play();
   };
 }
 
-
-// Ligação dos botões
 const backToStartBtn = document.getElementById("back-to-start-btn");
 backToStartBtn.addEventListener("click", () => {
   document.getElementById("coward-ending").classList.add("hidden");
   restartGame();
 });
-// Função que inicia a contagem regressiva
+
 function startCountdown() {
-  const timeLimit = 10; // 10 segundos de contagem
+  const timeLimit = 10;
   let remainingTime = timeLimit;
-  
-  // Exibe a contagem regressiva na tela ou no console
   const countdownDisplay = document.getElementById("countdown-display");
   countdownDisplay.textContent = `Tempo restante: ${remainingTime}s`;
-
-  // Atualiza a contagem a cada segundo
   countdownTimer = setInterval(() => {
     remainingTime--;
     countdownDisplay.textContent = `Tempo restante: ${remainingTime}s`;
-
     if (remainingTime <= 0) {
       clearInterval(countdownTimer);
       if (!isButtonClicked) {
-        showCowardEnding(); // Chama a função showCowardEnding em vez de showGameOver
+        showCowardEnding();
       }
     }
   }, 1000);
 }
 
-// Função chamada quando qualquer botão é clicado
 function onButtonClick() {
   isButtonClicked = true;
-  clearInterval(countdownTimer); // Interrompe a contagem regressiva
-  // Continue com o fluxo normal, por exemplo, avançar na história ou cena
-  // Exemplo: nextStory();
+  clearInterval(countdownTimer);
 }
 
-// Adicionando o evento de clique para os botões de caos
 document.querySelectorAll(".chaos-button").forEach((button) => {
   button.addEventListener("click", onButtonClick);
 });
 
 function continueStoryFromSpecialButton() {
-  const gameOverMusic = document.getElementById("game-over-music");
   gameOverMusic.play();
-  // Esconde a tela de caos
   const chaosContainer = document.getElementById("chaos-container");
   if (chaosContainer) chaosContainer.remove();
-
-  // Reseta o estado
   clearInterval(countdownTimer);
   isButtonClicked = true;
-
-  // Exibe a frase da história
   const storyText = document.getElementById("story-text");
   storyText.textContent = "Inacreditável! Você sobreviveu a todos os monstros, pulou pela janela e foi correndo o mais distânte possível da mansão.";
-
-  // Esconde o botão de avanço
   const nextBtn = document.getElementById("next-btn");
   if (nextBtn) nextBtn.classList.add("hidden");
-
-  // Exibe a tela de "Fim Sortudo"
   const gameOverScreen = document.createElement("div");
   gameOverScreen.className = "game-over-screen";
   gameOverScreen.innerHTML = `
@@ -1301,7 +1184,6 @@ function lanternaSotao(e) {
   const rect = lanternCanvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
-
   lightReveal.style.setProperty("--x", `${x}px`);
   lightReveal.style.setProperty("--y", `${y}px`);
 }
@@ -1312,13 +1194,10 @@ flashlightToggle.addEventListener("click", () => {
   flashlightEnabled = !flashlightEnabled;
   lightReveal.style.display = flashlightEnabled ? "block" : "none";
   lanternCanvas.style.cursor = flashlightEnabled ? "none" : "default";
-
-  // Alterna a classe active no botão para ativar a animação
   flashlightToggle.classList.toggle("active", flashlightEnabled);
-
-  // Exibe ou oculta o objeto misterioso com base na lanterna
   hiddenObject.classList.toggle("hidden", !flashlightEnabled);
 });
+
 lanternCanvas.addEventListener("mousemove", moveLantern);
 
 const hiddenObject = document.getElementById("hiddenObject");
@@ -1330,8 +1209,6 @@ hiddenObject.addEventListener("mouseenter", () => {
     hiddenObject.classList.add("hidden");
     flashlightEnabled = false;
     lanternCanvas.style.cursor = "default";
-
-    // Usa o caminho já definido
     currentPath = sotao2;
     pathIndex = 0;
     storyText.textContent = currentPath[pathIndex];
@@ -1345,36 +1222,27 @@ hiddenObject.addEventListener("mouseleave", () => {
 });
 
 document.getElementById("helpBtn").onclick = () => {
-  const gameOverMusic = document.getElementById("game-over-music");
   gameOverMusic.currentTime = 0;
   gameOverMusic.play();
-
   document.getElementById("impasse-buttons").classList.add("hidden");
   nextBtn.classList.add("hidden");
-
   const screen = document.getElementById("dark-screen");
   const glowText = document.getElementById("glow-text");
   const bgImage = document.getElementById("dark-background");
   const deathVideo = document.getElementById("death-video");
   const deathScreen = document.getElementById("death-screen");
-
   screen.classList.remove("hidden");
-
-  // Animações iniciais da tela escura
   setTimeout(() => {
     screen.style.opacity = 1;
     glowText.style.opacity = 1;
     backBtn.classList.add("hidden");
     typeWriterGlow("Você percebe que não fez uma escolha boa☠️", glowText, 120);
   }, 100);
-
   setTimeout(() => {
     bgImage.classList.remove("hidden");
     void bgImage.offsetHeight;
     bgImage.classList.add("visible");
   }, 4000);
-
-  // ⏱️ Após 15 segundos, mostra o vídeo
   setTimeout(() => {
     screen.classList.add("hidden");
     bgImage.classList.add("hidden");
@@ -1385,24 +1253,20 @@ document.getElementById("helpBtn").onclick = () => {
     gameOverMusic.pause();
     gameOverMusic.currentTime = 0
   }, 15000);
-
-  // Quando o vídeo terminar, mostra a tela de morte
   deathVideo.onended = () => {
     deathVideo.classList.add("hidden");
     deathScreen.classList.remove("hidden");
   };
 };
 
-// Botão de reinício
 document.getElementById("retry-btn").onclick = () => {
-  location.reload(); // ou sua lógica para voltar ao início do jogo
+  location.reload();
 };
 
 function typeWriterGlow(text, element, speed = 150, callback = null) {
   let i = 0;
   element.textContent = "";
   element.style.opacity = 1;
-
   function type() {
     if (i < text.length) {
       element.textContent += text.charAt(i);
@@ -1412,7 +1276,6 @@ function typeWriterGlow(text, element, speed = 150, callback = null) {
       callback();
     }
   }
-
   type();
 }
 
@@ -1429,22 +1292,18 @@ function iniciarMiniGameInimigos() {
   const canvas = document.getElementById("chase-minigame");
   const ctx = canvas.getContext("2d");
   canvas.classList.remove("hidden");
-
-  // Pausar músicas existentes
   [bgMusic, creepySound, newMusic, fnafMiniGameSound, mysterious, fear, heart].forEach(audio => {
     audio.pause();
     audio.currentTime = 0;
   });
-
   const player = {
-    x: canvas.width - 160, // perto da porta
+    x: canvas.width - 160,
     y: canvas.height / 2 - 30,
     width: 60,
     height: 60,
     speed: 3,
     color: "#00ff00"
   };
-
   const enemy = {
     x: 50,
     y: 50,
@@ -1453,7 +1312,6 @@ function iniciarMiniGameInimigos() {
     speed: 4.5,
     color: "#ff0000"
   };
-
   const door = {
     x: canvas.width - 100,
     y: canvas.height / 2 - 40,
@@ -1461,25 +1319,20 @@ function iniciarMiniGameInimigos() {
     height: 80,
     opened: false
   };
-
   const teclasAtivas = {
     ArrowUp: false,
     ArrowDown: false,
     ArrowLeft: false,
     ArrowRight: false
   };
-
   function handleKeydown(e) {
     if (e.key in teclasAtivas) teclasAtivas[e.key] = true;
   }
-  
   function handleKeyup(e) {
     if (e.key in teclasAtivas) teclasAtivas[e.key] = false;
   }
-
   document.addEventListener("keydown", handleKeydown);
   document.addEventListener("keyup", handleKeyup);
-
   function checkCollision(a, b) {
     return (
       a.x < b.x + b.width &&
@@ -1488,7 +1341,6 @@ function iniciarMiniGameInimigos() {
       a.y + a.height > b.y
     );
   }
-
   function updateEnemy() {
     const dx = player.x - enemy.x;
     const dy = player.y - enemy.y;
@@ -1498,77 +1350,56 @@ function iniciarMiniGameInimigos() {
       enemy.y += (dy / distance) * enemy.speed;
     }
   }
-
   const playerImage = new Image();
   playerImage.src = "https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927";
-
   const enemyImage = new Image();
   enemyImage.src = "https://static.wikia.nocookie.net/fnafapedia/images/e/e7/Spring_Freddy_Chomping.gif/revision/latest/scale-to-width-down/250?cb=20240106173010";
-
   const doorImage = new Image();
-  doorImage.src = "sótão.png"
-
+  doorImage.src = "img/sótão.png"
   function gameLoop() {
-    // Movimentação do jogador
     if (teclasAtivas.ArrowUp && player.y > 0) player.y -= player.speed;
     if (teclasAtivas.ArrowDown && player.y < canvas.height - player.height) player.y += player.speed;
     if (teclasAtivas.ArrowLeft && player.x > 0) player.x -= player.speed;
     if (teclasAtivas.ArrowRight && player.x < canvas.width - player.width) player.x += player.speed;
-
     updateEnemy();
-
-    // Verificar colisão com inimigo
     if (checkCollision(player, enemy)) {
       iniciarMiniGameBatalha();
       return;
     }
-
-    // Limpar tela
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Desenhar jogador
     if (playerImage.complete) {
       ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
     } else {
       ctx.fillStyle = player.color;
       ctx.fillRect(player.x, player.y, player.width, player.height);
     }
-
-    // Desenhar inimigo
     if (enemyImage.complete) {
       ctx.drawImage(enemyImage, enemy.x, enemy.y, enemy.width, enemy.height);
     } else {
       ctx.fillStyle = enemy.color;
       ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
     }
-
-    // Desenhar porta
     if (doorImage.complete) {
       ctx.drawImage(doorImage, door.x, door.y, door.width, door.height);
     } else {
       ctx.fillStyle = "brown";
       ctx.fillRect(door.x, door.y, door.width, door.height);
     }
-
     requestAnimationFrame(gameLoop);
   }
-
   gameLoop();
-
 }
 
 function iniciarMiniGameBatalha() {
   alone.pause();
   alone.currentTime = 0;
   aloneEnd.play();
-  
   const canvas = document.getElementById("chase-minigame");
   const ctx = canvas.getContext("2d");
   const box = { x: canvas.width / 2 - 150, y: canvas.height / 2 - 100, width: 300, height: 200 };
   const heart = { x: box.x + box.width / 2 - 20, y: box.y + box.height / 2 - 20, size: 40, speed: 5 };
   const teclasBatalha = { up: false, down: false, left: false, right: false };
   const balas = [];
-
   let recebeuDano = false;
   let timerDano = 0;
   let vida = 100;
@@ -1579,28 +1410,21 @@ function iniciarMiniGameBatalha() {
   let messageIndex = 0;
   const messageText = "Você vai morrer";
   let lateralBalasAtivas = false;
-
   let damageEffectFrames = 0;
-  let gameRunning = true; // flag para controle do loop
-
+  let gameRunning = true;
   const heartImage = new Image();
   heartImage.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Undertale_red_soul.svg/2048px-Undertale_red_soul.svg.png';
-
   const topImage = new Image();
-  topImage.src = 'fredão_chefe.gif';
-
+  topImage.src = 'img/fredão_chefe.gif';
   let heartImageLoaded = false;
   let topImageLoaded = false;
-
   function tryStart() {
     if (heartImageLoaded && topImageLoaded) {
       loopBatalha();
     }
   }
-
   heartImage.onload = () => { heartImageLoaded = true; tryStart(); };
   topImage.onload = () => { topImageLoaded = true; tryStart(); };
-
   function handle(e, isDown) {
     const tecla = e.key.toLowerCase();
     switch (tecla) {
@@ -1611,13 +1435,10 @@ function iniciarMiniGameBatalha() {
     }
     e.preventDefault();
   }
-
   document.addEventListener("keydown", e => handle(e, true));
   document.addEventListener("keyup", e => handle(e, false));
-
   function criarBala() {
     if (!gameRunning) return;
-
     const spawnSide = Math.random();
     if (!lateralBalasAtivas || spawnSide < 0.5) {
       balas.push({ x: Math.random() * (canvas.width - 10), y: 0, width: 30, height: 30, speed: balaSpeed, direction: 'down' });
@@ -1627,27 +1448,23 @@ function iniciarMiniGameBatalha() {
       balas.push({ x: canvas.width - 30, y: Math.random() * (canvas.height - 10), width: 30, height: 30, speed: balaSpeed, direction: 'left' });
     }
   }
-
   function moverBalas() {
     for (let i = balas.length - 1; i >= 0; i--) {
       const bala = balas[i];
       if (bala.direction === 'down') bala.y += bala.speed;
       else if (bala.direction === 'right') bala.x += bala.speed;
       else if (bala.direction === 'left') bala.x -= bala.speed;
-
       if (bala.x < -30 || bala.x > canvas.width + 30 || bala.y > canvas.height + 30) {
         balas.splice(i, 1);
       }
     }
   }
-
   function desenharBalas() {
     ctx.fillStyle = "yellow";
     for (const bala of balas) {
       ctx.fillRect(bala.x, bala.y, bala.width, bala.height);
     }
   }
-
   function checarColisaoBala() {
     for (let i = balas.length - 1; i >= 0; i--) {
       const b = balas[i];
@@ -1659,48 +1476,39 @@ function iniciarMiniGameBatalha() {
       ) {
         vida -= 20;
         balas.splice(i, 1);
-  
-        // Ativa o efeito de dano
         damageEffectFrames = 6;
         recebeuDano = true;
         timerDano = 20;
-  
         if (vida <= 0) playerAlive = false;
       }
     }
   }
-
   function desenharBox() {
     ctx.fillStyle = "white";
     ctx.strokeStyle = "black";
     ctx.lineWidth = 4;
     ctx.strokeRect(box.x, box.y, box.width, box.height);
   }
-
   function desenharHeart() {
     if (damageEffectFrames > 0) {
       if (damageEffectFrames % 2 === 0) {
-        damageEffectFrames--; // decrementa mesmo se não desenhar
+        damageEffectFrames--;
         return;
       }
       damageEffectFrames--;
     }
     ctx.drawImage(heartImage, heart.x, heart.y, heart.size, heart.size);
   }
-
   function desenharTopImage() {
     ctx.drawImage(topImage, box.x + box.width / 2 - 75, box.y - 150, 170, 150);
   }
-
   function moverHeart() {
     if (teclasBatalha.up && heart.y > box.y) heart.y -= heart.speed;
     if (teclasBatalha.down && heart.y < box.y + box.height - heart.size) heart.y += heart.speed;
     if (teclasBatalha.left && heart.x > box.x) heart.x -= heart.speed;
     if (teclasBatalha.right && heart.x < box.x + box.width - heart.size) heart.x += heart.speed;
   }
-
   setInterval(criarBala, 1000);
-
   function typeMessage(callback) {
     if (messageIndex < messageText.length) {
       message += messageText.charAt(messageIndex++);
@@ -1711,71 +1519,54 @@ function iniciarMiniGameBatalha() {
       setTimeout(() => { showMessage = false; }, 4000);
     }
   }
-
   setTimeout(() => {
     showMessage = true;
     typeMessage();
   }, 16000);
-
   setTimeout(() => {
     setInterval(criarBala, 700);
     lateralBalasAtivas = true;
-  }, 22000);
-
-  // 🛑 Após 30 segundos, finaliza o minigame
+  }, 23000);
+  setTimeout(() => {
+    setInterval(criarBala, 500);
+    lateralBalasAtivas = true;
+  }, 30000);
   setTimeout(() => {
     gameRunning = false;
     finalizarMiniGameBatalha();
   }, 36000);
-
   function finalizarMiniGameBatalha() {
     aloneEnd.pause();
     aloneEnd.currentTime = 0;
     aloneEnd2.currentTime = 0;
     aloneEnd2.play();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
     const telaFinal = document.getElementById("tela-final");
     const botaoMatar = document.getElementById("botao-matar");
     const fadeOverlay = document.getElementById("fade-overlay");
     const videoFinal = document.getElementById("video-final");
     const telaEgo = document.getElementById("tela-ego");
-  
     if (telaFinal) telaFinal.style.display = "flex";
-  
     botaoMatar.onclick = () => {
-      // Oculta botão/tela
       telaFinal.style.display = "none";
-  
-      // Começa fade-in (escurecendo por 10s)
       fadeOverlay.style.opacity = "1";
-  
       setTimeout(() => {
-        // Mostra vídeo após fade-in
-        fadeOverlay.style.opacity = "0"; // remove fade preto após 10s
+        fadeOverlay.style.opacity = "0";
         videoFinal.style.display = "block";
         videoFinal.play();
-  
-        // Quando o vídeo termina
         videoFinal.onended = () => {
-          // Fade-out (escurecendo por 10s)
           fadeOverlay.style.opacity = "1";
-  
           setTimeout(() => {
             videoFinal.style.display = "none";
-            fadeOverlay.style.opacity = "0"; // tira o fade
-            
-            // Mostra tela final
+            fadeOverlay.style.opacity = "0";
             if (telaEgo) telaEgo.style.display = "flex";
-          }, 10000); // após fade-out
+          }, 10000);
         };
-      }, 10000); // após fade-in
+      }, 10000);
     };
   }
-
   function loopBatalha() {
     if (!gameRunning || !playerAlive) return;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     desenharBox();
     desenharTopImage();
@@ -1784,32 +1575,23 @@ function iniciarMiniGameBatalha() {
     moverBalas();
     desenharBalas();
     checarColisaoBala();
-
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
     ctx.fillText("Vida: " + vida, 20, 30);
-
     if (showMessage) {
       ctx.font = "30px Arial";
       ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width / 2, canvas.height / 2);
     }
-
     if (!playerAlive) {
       gameRunning = false;
-    
-      // Pausa a música
       aloneEnd.pause();
       aloneEnd.currentTime = 0;
-    
-      // Exibe a tela de morte
       const telaMorte = document.getElementById("tela-morte");
       if (telaMorte) {
         telaMorte.style.display = "flex";
       }
-    
       return;
     }
-
     if (timerDano > 0) {
       ctx.fillStyle = "red";
       timerDano--;
@@ -1818,7 +1600,6 @@ function iniciarMiniGameBatalha() {
     }
     ctx.font = "20px Arial";
     ctx.fillText("Vida: " + vida, 20, 30);
-
     requestAnimationFrame(loopBatalha);
   }
 }
@@ -1847,11 +1628,9 @@ const moveMinigame = document.getElementById("move-minigame");
 const moveCanvas = document.getElementById("moveCanvas");
 const ctx = moveCanvas.getContext("2d");
 
-// Verifica se canvas tem tamanho válido
 moveCanvas.width = 800;
 moveCanvas.height = 600;
 
-// Imagens
 const backgroundImg = new Image();
 const playerImg = new Image();
 const targetImg = new Image();
@@ -1862,39 +1641,32 @@ let keys = {};
 let allImagesLoaded = 0;
 let isMinigameActive = false;
 
-// Desenha tudo
 function draw() {
   ctx.clearRect(0, 0, moveCanvas.width, moveCanvas.height);
-
   if (backgroundImg.complete) {
     ctx.drawImage(backgroundImg, 0, 0, moveCanvas.width, moveCanvas.height);
   }
-
   if (targetImg.complete) {
     ctx.drawImage(targetImg, target.x, target.y, target.width, target.height);
   }
-
   if (playerImg.complete) {
     ctx.drawImage(playerImg, player.x, player.y, player.width, player.height);
   }
 }
 
 function update() {
-  if (!isMinigameActive) return; // se não estiver ativo, para o loop
-
+  if (!isMinigameActive) return;
   if (keys["ArrowUp"] && player.y > 0) player.y -= 3;
   if (keys["ArrowDown"] && player.y + player.height < moveCanvas.height) player.y += 3;
   if (keys["ArrowLeft"] && player.x > 0) player.x -= 3;
   if (keys["ArrowRight"] && player.x + player.width < moveCanvas.width) player.x += 3;
-
-  // Colisão com o alvo
   if (
     player.x < target.x + target.width &&
     player.x + player.width > target.x &&
     player.y < target.y + target.height &&
     player.y + player.height > target.y
   ) {
-    isMinigameActive = false; // para o loop
+    isMinigameActive = false;
     endMoveMinigame();
     if (typeof mysterious !== "undefined") {
       mysterious.pause();
@@ -1902,7 +1674,6 @@ function update() {
     }
     return;
   }
-
   draw();
   requestAnimationFrame(update);
 }
@@ -1910,60 +1681,46 @@ function update() {
 function checkLoaded() {
   allImagesLoaded++;
   if (allImagesLoaded === 3) {
-    isMinigameActive = true; // inicia o loop
+    isMinigameActive = true;
     draw();
     requestAnimationFrame(update);
   }
 }
 
 function iniciarMoveMinigame() {
-  allImagesLoaded = 0; // Resetar contagem
-
-  // Defina primeiro os src
+  allImagesLoaded = 0;
   backgroundImg.src = 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/822920/ss_ccfc465fcdebec08484f1eb1ae8bf8a6747bb4ad.1920x1080.jpg?t=1590204819';
   playerImg.src = 'https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest?cb=20161103224927';
   targetImg.src = 'https://static.wikia.nocookie.net/pizzaria-freddy-fazbear/images/0/0b/Baby_Sprite_Idle.gif/revision/latest?cb=20161011172021&path-prefix=pt-br';
-
-  // Só depois atribua os onload
   backgroundImg.onload = checkLoaded;
   playerImg.onload = checkLoaded;
   targetImg.onload = checkLoaded;
-
-  // Oculta a tela do jogo (se existir)
   if (typeof gameScreen !== "undefined") {
     gameScreen.classList.add("hidden");
   }
-
   moveMinigame.classList.remove("hidden");
-
-  // Resetar posição
   player.x = 100;
   player.y = 100;
 }
 
 function endMoveMinigame() {
-  // Oculta a tela do minigame
   moveMinigame.classList.add("hidden");
-  
-  // Para o loop do minigame
-  isMinigameActive = false; 
-  
-  // Exibe a tela de morte após 3 segundos de fade
+  gameOverMusic.currentTime = 0;
+  gameOverMusic.play();
+  isMinigameActive = false;
   const morteScreen = document.getElementById("morte-screen");
-  
-  // Adiciona a classe 'visible' após um pequeno atraso
   setTimeout(() => {
     morteScreen.classList.remove("hidden");
     morteScreen.classList.add("visible");
-  }, 3000); // 3 segundos de atraso
-  
-  // Adiciona evento para reiniciar o jogo
-  document.getElementById("restart-btn").onclick = function() {
-    morteScreen.classList.remove("visible");
-    morteScreen.classList.add("hidden");
-  };
+    if (!morteScreen.querySelector("back-btn")) {
+      const backBtn = document.getElementById("back-btn").cloneNode(true);
+      morteScreen.appendChild(backBtn);
+      backBtn.onclick = function() {
+        restartGame();
+      };
+    }
+  }, 3000);
 }
 
-// Teclas
 document.addEventListener("keydown", (e) => keys[e.key] = true);
 document.addEventListener("keyup", (e) => keys[e.key] = false);

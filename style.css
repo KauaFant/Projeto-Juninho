@@ -24,21 +24,11 @@ body.background-image {
 
 @font-face {
   font-family: 'Sinistra';
-  src: url('shlop\ rg.otf') format('truetype');
+  src: url('shlop rg.otf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
-#start-screen h1 {
-  font-family: 'Sinistra', sans-serif;
-  font-size: 200px;
-  letter-spacing: 2px;
-  color: #fff;
-  text-shadow: 2px 2px 4px #000;
-
-}
-
-/* Tela de início */
 #start-screen {
   display: flex;
   flex-direction: column;
@@ -48,16 +38,22 @@ body.background-image {
   width: 100%;
   background: url('https://68.media.tumblr.com/f0e09588b780e959f95e4769343beaa0/tumblr_okpliklZ3e1vm2ftdo1_r1_500.gif') no-repeat center center/cover;
   transition: opacity 2s ease;
-
   position: absolute;
-  z-index: 1; /* <- muda só isso! deixa menor que o botão */
+  z-index: 1;
+}
+
+#start-screen h1 {
+  font-family: 'Sinistra', sans-serif;
+  font-size: 200px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 2px 2px 4px #000;
 }
 
 .fade-out {
   opacity: 0;
 }
 
-/* Tela do jogo */
 #game-screen {
   display: flex;
   flex-direction: column;
@@ -66,7 +62,6 @@ body.background-image {
   padding: 20px;
 }
 
-/* Texto da história */
 #story-text {
   font-size: 24px;
   margin-bottom: 20px;
@@ -75,7 +70,6 @@ body.background-image {
   transition: opacity 0.5s ease;
 }
 
-/* Botões padrão */
 button {
   background-color: #222;
   color: white;
@@ -92,7 +86,6 @@ button:hover {
   background-color: #444;
 }
 
-/* Botão "Avançar" */
 #next-btn {
   background-color: #444;
   border: 2px solid #666;
@@ -104,7 +97,6 @@ button:hover {
   background-color: #444;
 }
 
-/* Botões de escolha */
 #choices {
   display: flex;
   gap: 20px;
@@ -121,7 +113,6 @@ button:hover {
   background-color: #666;
 }
 
-/* Classe de ocultar elementos */
 .hidden {
   display: none !important;
 }
@@ -137,7 +128,7 @@ button:hover {
   font-size: 14px;
   cursor: pointer;
   border-radius: 8px;
-  z-index: 99999; /* alto pra ficar por cima de tudo */
+  z-index: 999999;
   opacity: 0.7;
   transition: opacity 0.3s, background-color 0.3s;
 }
@@ -164,7 +155,7 @@ button:hover {
 #fnaf4-canvas {
   width: 100%;
   height: 100%;
-  background-color: black; /* Padrão escuro */
+  background-color: black;
   position: absolute;
   top: 0;
   left: 0;
@@ -194,8 +185,8 @@ button:hover {
   transform: translate(-50%, -50%);
   background-color: red;
   color: white;
-  padding: 10px 20px; /* Reduzido */
-  font-size: 16px;     /* Reduzido */
+  padding: 10px 20px;
+  font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -234,7 +225,7 @@ button:hover {
 }
 
 #fnaf4-scene.background-visible {
-  display: block; /* Exibe a imagem quando a classe for adicionada */
+  display: block;
 }
 
 #fnafLightReveal {
@@ -248,15 +239,13 @@ button:hover {
   background-position: center;
   z-index: 1000;
   display: none;
-
-  /* Aplica a máscara circular baseada na posição do mouse */
   mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
   -webkit-mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
   mask-repeat: no-repeat;
   -webkit-mask-repeat: no-repeat;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
-  pointer-events: none; /* permite que o mouse interaja com o que está atrás */
+  pointer-events: none;
 }
 
 #video-container {
@@ -271,6 +260,7 @@ button:hover {
   align-items: center;
   z-index: 10000;
 }
+
 #scary-video {
   width: 100%;
   height: 100%;
@@ -304,8 +294,11 @@ button:hover {
   border-radius: 5px;
   cursor: pointer;
   box-shadow: 0 0 10px black;
-  transition: transform 0.2s;
+  transition: transform 0.2s, opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
 }
+
 .chaos-button:hover {
   transform: scale(1.1);
 }
@@ -318,29 +311,20 @@ button:hover {
   height: 100%;
   background: black;
   display: flex;
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: center; /* Centraliza verticalmente */
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   z-index: 10000;
   color: white;
   font-family: 'Creepster', cursive;
-  text-align: center; /* Centraliza o texto dentro dos elementos */
-}
-
-#coward-ending {
-  background-image: 
-    radial-gradient(circle, 
-      rgba(255, 0, 0, 1) 0%, 
-      rgba(139, 0, 0, 0.9) 40%, 
-      rgba(46, 0, 0, 0.8) 70%, 
-      rgba(0, 0, 0, 0.7) 100%);
+  text-align: center;
+  background-image: radial-gradient(circle, rgba(255, 0, 0, 1) 0%, rgba(139, 0, 0, 0.9) 40%, rgba(46, 0, 0, 0.8) 70%, rgba(0, 0, 0, 0.7) 100%);
   background-size: cover;
   background-position: center;
   padding: 50px;
   animation: fadeInBackground 3s ease-in-out;
 }
 
-/* Efeito de animação na escrita 'Final Medroso' */
 #ending-title {
   font-size: 3rem;
   color: rgb(117, 0, 128);
@@ -349,7 +333,6 @@ button:hover {
   margin-right: 1rem;
 }
 
-/* Animação para o título "Final Medroso" */
 @keyframes slideInText {
   0% {
     transform: translateX(-100%);
@@ -361,7 +344,6 @@ button:hover {
   }
 }
 
-/* Animação para o fundo do game over */
 @keyframes fadeInBackground {
   0% {
     opacity: 0;
@@ -371,13 +353,12 @@ button:hover {
   }
 }
 
-/* Para o texto principal "Gamer Over" */
 #ending-main {
   font-size: 5rem;
-  color: transparent; /* Definir a cor do texto como transparente */
-  background-image: linear-gradient(to right, rgb(48, 48, 48), rgb(0, 0, 0)); /* Aplica o gradiente ao texto */
-  -webkit-background-clip: text; /* Faz o gradiente ser aplicado ao texto */
-  background-clip: text; /* Para compatibilidade com outros navegadores */
+  color: transparent;
+  background-image: linear-gradient(to right, rgb(48, 48, 48), rgb(0, 0, 0));
+  -webkit-background-clip: text;
+  background-clip: text;
   animation: pulseText 1s ease-in-out infinite;
 }
 
@@ -397,41 +378,21 @@ button:hover {
   background-color: rgb(100, 0, 0);
 }
 
-.chaos-button:hover {
-  transform: scale(1.1);
-}
-
-.chaos-button {
-  background-color: crimson;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 0 10px black;
-  transition: transform 0.2s, opacity 0.3s ease;
-  opacity: 0; /* Inicialmente invisível */
-  pointer-events: none; /* Impede clique quando invisível */
-}
-
 .chaos-button.special {
-  background-color:crimson;;
+  background-color: crimson;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   box-shadow: 0 0 10px rgb(184, 106, 132);
   transition: transform 0.2s, opacity 0.3s ease;
-  opacity: 0; /* Inicialmente invisível */
-  pointer-events: none; /* Impede clique quando invisível */
+  opacity: 0;
+  pointer-events: none;
 }
 
 .chaos-button.visible {
   opacity: 1;
   pointer-events: auto;
-}
-
-.chaos-button.visible {
-  opacity: 1; /* Torna visível quando a classe 'visible' é adicionada */
 }
 
 #cozinha {
@@ -445,15 +406,13 @@ button:hover {
   background-position: center;
   z-index: 1000;
   display: none;
-
-  /* Aplica a máscara circular baseada na posição do mouse */
   mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
   -webkit-mask-image: radial-gradient(circle 250px at var(--x, 50%) var(--y, 50%), white 0%, transparent 60%);
   mask-repeat: no-repeat;
   -webkit-mask-repeat: no-repeat;
   mask-size: 100% 100%;
   -webkit-mask-size: 100% 100%;
-  pointer-events: none; /* permite que o mouse interaja com o que está atrás */
+  pointer-events: none;
 }
 
 #Medroso.active {
@@ -498,9 +457,9 @@ button:hover {
 }
 
 section {
-  width: 100vw; /* 100% da largura da tela */
-  background-color: rgba(0, 0, 0, 0.5); /* preto com 50% de transparência */
-  position: relative; /* para garantir que ele fique dentro do fluxo da página */
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: relative;
   left: 0;
   right: 0;
 }
@@ -511,29 +470,25 @@ section {
   left: 1;
   width: 100%;
   height: 100%;
-  background: black;
-  display: flex;
-  align-items: center; /* Centraliza verticalmente */
-  flex-direction: column;
-  z-index: 10000;
-  color: white;
-  font-family: 'Creepster', cursive;
-  text-align: center; /* Centraliza o texto dentro dos elementos */
-}
-
-.game-over-screen{
   background-image: url("https://preview.redd.it/3vgdrc5p08dz.png?width=1080&crop=smart&auto=webp&s=3dbb5d0d6674875194e205ff81369f19de27c21f");
   background-size: cover;
   background-position: center;
   padding: 50px;
   animation: fadeInBackground 15s ease-in-out;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10000;
+  color: white;
+  font-family: 'Creepster', cursive;
+  text-align: center;
 }
 
 @keyframes gradientText {
   0% {
     color: rgb(117, 0, 128);
   }
-  25%{
+  25% {
     color: rgb(2, 27, 250);
   }
   50% {
@@ -542,7 +497,7 @@ section {
   75% {
     color: rgb(0, 255, 76);
   }
-  100%{
+  100% {
     color: green;
   }
 }
@@ -627,8 +582,8 @@ section {
   pointer-events: none;
   background: radial-gradient(circle 100px at center, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.95) 80%);
   mix-blend-mode: lighten;
-  z-index: 9999;  /* Garante que a lanterna fique acima de outros elementos */
-  display: none;  /* Só exibe quando ativado */
+  z-index: 9999;
+  display: none;
 }
 
 #lantern-minigame {
@@ -678,7 +633,7 @@ section {
 #flashlightToggle.active {
   background-color: yellow;
   color: black;
-  box-shadow: 0 0 20px yellow;
+  animation: flashlightFlash 0.6s ease-out, flashlightPulse 1.5s infinite ease-in-out;
 }
 
 #flashlightToggle { left: 10px; }
@@ -697,32 +652,26 @@ section {
   50% { box-shadow: 0 0 30px yellow; }
 }
 
-#flashlightToggle.active {
-  background-color: yellow;
-  color: black;
-  animation: flashlightFlash 0.6s ease-out, flashlightPulse 1.5s infinite ease-in-out;
-}
-
 #minigame-room {
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-image: url('https://external-preview.redd.it/quite-satisfied-with-the-void-world-i-managed-to-create-for-v0-aW84MTlhdzlicHJlMcdPr1NwLmr2nCa1tm2fS9pLVcm5bKm7Sce3S-5VNaV8.png?format=pjpg&auto=webp&s=2d0805c0536b6b7c3e135c0a566f93e7120196cc'); /* imagem do quarto */
+  background-image: url('https://external-preview.redd.it/quite-satisfied-with-the-void-world-i-managed-to-create-for-v0-aW84MTlhdzlicHJlMcdPr1NwLmr2nCa1tm2fS9pLVcm5bKm7Sce3S-5VNaV8.png?format=pjpg&auto=webp&s=2d0805c0536b6b7c3e135c0a566f93e7120196cc');
   background-size: cover;
   overflow: hidden;
 }
 
 #player {
   position: absolute;
-  width: 80px;  /* hitbox */
+  width: 80px;
   height: 110px;
   left: 50px;
   bottom: 20px;
-  overflow: visible; /* permite a imagem passar dos limites */
+  overflow: visible;
 }
 
 #player .sprite {
-  width: 150px; /* tamanho visual */
+  width: 150px;
   height: 150px;
   background-image: url('https://static.wikia.nocookie.net/freddy-fazbears-pizza/images/f/fd/Regular.gif/revision/latest/smart/width/300/height/300?cb=20161103224927');
   background-size: contain;
@@ -736,20 +685,20 @@ section {
   position: absolute;
   width: 60px;
   height: 60px;
-  background-image: url('https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif'); /* Imagem da chave */
+  background-image: url('https://media.tenor.com/JfiEuZyOJX4AAAAj/key-turning.gif');
   background-size: cover;
-  left: 800px; /* posição da chave */
+  left: 800px;
   bottom: 350px;
   z-index: 5;
 }
 
 #porta {
   position: absolute;
-  width: 150px; /* Aumentei o tamanho da largura da porta */
-  height: 250px; /* Aumentei o tamanho da altura da porta */
-  background-image: url('door.png'); /* Imagem da porta */
+  width: 150px;
+  height: 250px;
+  background-image: url('img/door.png');
   background-size: cover;
-  left: 80%; /* posição da porta */
+  left: 80%;
   bottom: 20px;
   z-index: 5;
 }
@@ -795,13 +744,12 @@ section {
   position: absolute;
   top: 80%;
   left: 48%;
-  width: 200px; /* Tamanho da imagem */
+  width: 200px;
   height: auto;
   transform: translate(-50%, -50%);
   z-index: 10002;
   pointer-events: auto;
   transition: opacity 0.3s ease;
-  
 }
 
 #hiddenObject.hidden {
@@ -850,7 +798,7 @@ section {
   text-shadow: 0 0 10px white, 0 0 20px #ccc;
   font-family: 'Courier New', Courier, monospace;
   opacity: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* fundo escuro e transparente */
+  background-color: rgba(0, 0, 0, 0.6);
   padding: 20px;
   border-radius: 10px;
 }
@@ -863,7 +811,7 @@ section {
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 8s ease; /* <--- alterado para 4 segundos */
+  transition: opacity 8s ease;
   z-index: -1;
 }
 
@@ -926,14 +874,11 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Certifique-se de que está acima de outros elementos */
-  opacity: 0; /* Começa invisível */
-  transition: opacity 3s ease; /* Transição de 3 segundos */
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 3s ease;
 }
 
 #morte-screen.visible {
-  opacity: 1; /* Torna visível */
+  opacity: 1;
 }
-
-
-
